@@ -8,52 +8,54 @@
   :root { color-scheme: light; }
   .viz-root {
     color-scheme: light;
-    --surface-1:      #fcfcfb;
-    --page-plane:     #f9f9f7;
-    --text-primary:   #0b0b0b;
-    --text-secondary: #52514e;
-    --text-muted:     #898781;
-    --gridline:       #e1e0d9;
-    --baseline:       #c3c2b7;
-    --border:         rgba(11,11,11,0.10);
-    --success:        #006300;
-    --series-1: #2a78d6; /* blue - efectivo */
-    --series-2: #eb6834; /* orange - tarjeta */
-    --series-3: #1baf7a; /* aqua - transferencia */
-    --series-4: #eda100; /* yellow - cuentas por cobrar */
-    --series-5: #e87ba4; /* magenta - pagos en linea */
-    --series-6: #008300; /* green - anticipos */
-    --series-7: #4a3aa7; /* violet */
-    --series-8: #e34948; /* red */
-    --status-good:    #0ca30c;
-    --status-warning: #fab219;
-    --status-serious: #ec835a;
-    --status-critical:#d03b3b;
+    /* Paleta pastel inspirada en Cactus Tours (verde cactus, ámbar dorado, terracota desierto) */
+    --surface-1:      #fffdf8;
+    --page-plane:     #faf6ee;
+    --text-primary:   #2f2a20;
+    --text-secondary: #6b6152;
+    --text-muted:     #a79c8a;
+    --gridline:       #ece3d2;
+    --baseline:       #d9cbb0;
+    --border:         rgba(47,42,32,0.10);
+    --success:        #4c7a4a;
+    --series-1: #8fb996; /* verde cactus pastel - efectivo */
+    --series-2: #eab868; /* ámbar dorado pastel - tarjeta */
+    --series-3: #d98f77; /* terracota pastel - transferencia */
+    --series-4: #e8cd7a; /* arena dorada pastel - cuentas por cobrar */
+    --series-5: #dd9bb0; /* rosa flor de cactus - pagos en linea */
+    --series-6: #6f9b74; /* verde salvia profundo - anticipos */
+    --series-7: #b39ddb; /* lavanda suave */
+    --series-8: #e08670; /* coral suave */
+    --status-good:    #5c8a52;
+    --status-warning: #e3ab53;
+    --status-serious: #e0916c;
+    --status-critical:#cf6555;
   }
   @media (prefers-color-scheme: dark) {
     :root:where(:not([data-theme="light"])) .viz-root {
       color-scheme: dark;
-      --surface-1:      #1a1a19;
-      --page-plane:     #0d0d0d;
-      --text-primary:   #ffffff;
-      --text-secondary: #c3c2b7;
-      --text-muted:     #898781;
-      --gridline:       #2c2c2a;
-      --baseline:       #383835;
+      /* Variante nocturna del desierto: tonos cálidos oscuros en vez de negro/azul puro */
+      --surface-1:      #262019;
+      --page-plane:     #17130d;
+      --text-primary:   #f7f1e6;
+      --text-secondary: #cbbfa8;
+      --text-muted:     #9a8d76;
+      --gridline:       #362e22;
+      --baseline:       #46392a;
       --border:         rgba(255,255,255,0.10);
-      --success:        #0ca30c;
-      --series-1: #3987e5;
-      --series-2: #d95926;
-      --series-3: #199e70;
-      --series-4: #c98500;
-      --series-5: #d55181;
-      --series-6: #008300;
-      --series-7: #9085e9;
-      --series-8: #e66767;
-      --status-good:    #0ca30c;
-      --status-warning: #fab219;
-      --status-serious: #ec835a;
-      --status-critical:#d03b3b;
+      --success:        #7fbf7a;
+      --series-1: #a3cba8;
+      --series-2: #f0c479;
+      --series-3: #e3a68d;
+      --series-4: #f2da8f;
+      --series-5: #eab0c2;
+      --series-6: #86b489;
+      --series-7: #c6b3ea;
+      --series-8: #ec9a86;
+      --status-good:    #7fbf7a;
+      --status-warning: #f0c060;
+      --status-serious: #eaa377;
+      --status-critical:#e07b6a;
     }
   }
   * { box-sizing: border-box; }
@@ -75,7 +77,7 @@
     background: linear-gradient(135deg, var(--series-1), var(--series-3));
     display:flex; align-items:center; justify-content:center;
     color:#fff; font-weight:700; font-size:18px;
-    box-shadow: 0 4px 10px rgba(42,120,214,0.28);
+    box-shadow: 0 4px 10px rgba(143,185,150,0.35);
   }
   header h1 { font-size: 22px; font-weight: 700; margin: 0 0 4px; }
   header p { margin: 0; color: var(--text-secondary); font-size: 14px; }
@@ -176,11 +178,11 @@
   }
   table.data-table th:first-child, table.data-table td:first-child,
   table.data-table th:nth-child(2), table.data-table td:nth-child(2) { text-align:left; font-variant-numeric: normal; }
-  table.data-table thead tr { background: linear-gradient(90deg, rgba(42,120,214,0.08), rgba(27,175,122,0.05)); }
+  table.data-table thead tr { background: linear-gradient(90deg, rgba(143,185,150,0.14), rgba(111,155,116,0.06)); }
   table.data-table th { color: var(--text-secondary); font-weight:600; font-size:12px; cursor:pointer; user-select:none; border-bottom:2px solid var(--baseline); }
   table.data-table th:hover { color: var(--series-1); }
   table.data-table tbody tr:nth-child(even) { background: rgba(128,128,128,0.035); }
-  table.data-table tbody tr:hover { background: rgba(42,120,214,0.08); }
+  table.data-table tbody tr:hover { background: rgba(143,185,150,0.12); }
   .table-scroll { overflow-x:auto; }
   .cat-swatch { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:7px; }
   table.data-table tr.total-row td {
@@ -221,7 +223,7 @@
     <button class="btn secondary hidden" id="shareBtn">Generar versión para compartir</button>
     <div id="warnings"></div>
   </div>
-  <div id="snapshotBanner" class="panel hidden" style="border-left:4px solid var(--series-4); background:rgba(237,161,0,0.07);">
+  <div id="snapshotBanner" class="panel hidden" style="border-left:4px solid var(--series-4); background:rgba(232,205,122,0.16);">
     <strong>Reporte de solo lectura</strong> — generado el <span id="snapshotDate"></span>. Los datos no se actualizan automáticamente; para ver la información en vivo, se necesita el dashboard conectado a la carpeta de reportes.
   </div>
 
@@ -236,6 +238,8 @@
   </div>
 
   <div id="dashboard" class="hidden">
+    <div class="section-title-row"><span class="dot" style="background:var(--series-1)"></span><h2 class="section-title" id="monthTitle">Acumulado del mes</h2></div>
+    <p class="section-sub" id="monthSub"></p>
     <section class="kpi-grid" id="kpiGrid"></section>
 
     <div class="panel" style="margin-top:18px;">
@@ -308,7 +312,7 @@
   <footer>Generado localmente en tu navegador — ningún dato sale de tu computadora.</footer>
 </div>
 
-<script>window.__EMBEDDED_DATA__ = {"days": [{"date": "2026-07-27", "files": ["27 JULIO REPORTE INGRESOS.xlsx"], "transactions": 357, "noshows": 13, "pax": 1030.0, "fxAvg": 18.583551951219516, "mxnTotal": 1191257.579388, "usdTotal": 31197.44, "mxnEquivalent": 1782899.9489672685, "payment": {"efectivo": 366619.00048726826, "tarjeta": 1230754.8196, "transferencia": 0.0, "cuentasPorCobrar": 7555.88888, "pagosLinea": 48507.28, "anticipos": 129462.96}, "categoryRevenue": {"AI HALF": 305150.6213, "COMBO": 689625.065495805, "RZR": 305264.58379999996, "AI 6 HOURS": 2250.0, "CAMELLOS": 185758.77977999998, "AI FULL": 43995.020000000004, "MOTOS": 128467.11859146341, "TIROLESA": 5660.0, "CABALLOS": 33924.0, "PREMIUM": 36949.759999999995, "COMBO3X1": 45855.0}, "categories": {"AI HALF": 156.0, "COMBO": 428.0, "RZR": 151.0, "AI 6 HOURS": 1.0, "CAMELLOS": 133.0, "AI FULL": 8.0, "MOTOS": 86.0, "TIROLESA": 11.0, "CABALLOS": 29.0, "PREMIUM": 6.0, "COMBO3X1": 21.0}}], "fileCount": 1, "generatedAt": "29 de julio de 2026, 18:05 UTC"};</script>
+<script>window.__EMBEDDED_DATA__ = {"days": [{"date": "2026-07-27", "files": ["27 JULIO REPORTE INGRESOS.xlsx"], "transactions": 357, "noshows": 13, "pax": 1030.0, "fxAvg": 18.583551951219516, "mxnTotal": 1191257.579388, "usdTotal": 31197.44, "mxnEquivalent": 1782899.9489672685, "payment": {"efectivo": 366619.00048726826, "tarjeta": 1230754.8196, "transferencia": 0.0, "cuentasPorCobrar": 7555.88888, "pagosLinea": 48507.28, "anticipos": 129462.96}, "categoryRevenue": {"AI HALF": 305150.6213, "COMBO": 689625.065495805, "RZR": 305264.58379999996, "AI 6 HOURS": 2250.0, "CAMELLOS": 185758.77977999998, "AI FULL": 43995.020000000004, "MOTOS": 128467.11859146341, "TIROLESA": 5660.0, "CABALLOS": 33924.0, "PREMIUM": 36949.759999999995, "COMBO3X1": 45855.0}, "categories": {"AI HALF": 156.0, "COMBO": 428.0, "RZR": 151.0, "AI 6 HOURS": 1.0, "CAMELLOS": 133.0, "AI FULL": 8.0, "MOTOS": 86.0, "TIROLESA": 11.0, "CABALLOS": 29.0, "PREMIUM": 6.0, "COMBO3X1": 21.0}}], "fileCount": 1, "generatedAt": "29/07/2026 21:35 UTC"};</script>
 
 <script>
 (function(){
@@ -317,6 +321,7 @@
   // ---------- state ----------
   let dirHandle = null;
   let lastData = null; // { days: [...], categoriesByDay: {date: {cat:pax}}, categoriesGlobal: {cat:pax} }
+  let lastMonthData = null; // lastData.days filtrado al mes calendario más reciente (lo que se muestra en pantalla)
   let daySortKey = 'date', daySortDir = -1;
   let categoryMetric = 'revenue'; // 'pax' | 'revenue' — revenue shown first, per request
 
@@ -357,6 +362,21 @@
     return n.toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2});
   }
   function fmtInt(n){ return Math.round(n).toLocaleString('es-MX'); }
+  function fmtMonthLabel(ym){
+    const [y,m] = ym.split('-');
+    const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    return meses[parseInt(m,10)-1] + ' ' + y;
+  }
+  // Acumula solo los días del mes calendario más reciente presente en los datos,
+  // para que el dashboard muestre el "acumulado del mes" y se reinicie solo al
+  // empezar un mes nuevo (en vez de sumar todo el histórico para siempre).
+  function filterToCurrentMonth(days){
+    if (!days || !days.length) return days;
+    let maxDate = days[0].date;
+    for (const d of days) if (d.date > maxDate) maxDate = d.date;
+    const ym = maxDate.slice(0,7);
+    return { ym, days: days.filter(d => d.date.slice(0,7) === ym) };
+  }
 
   // ---------- IndexedDB handle persistence ----------
   const DB_NAME = 'ingresos-dashboard-db', STORE = 'handles';
@@ -654,12 +674,18 @@
 
   // ---------- render orchestration ----------
   function renderAll(data){
-    renderKpis(data);
-    renderDaySelect(data);
-    renderTrendChart(data);
-    renderPaymentChart(data);
-    renderCategoryChart(data, daySelect.value);
-    renderDayTable(data);
+    const filtered = filterToCurrentMonth(data.days);
+    const monthData = { days: filtered.days, fileCount: data.fileCount };
+    lastMonthData = monthData;
+    document.getElementById('monthTitle').textContent = 'Acumulado de ' + fmtMonthLabel(filtered.ym);
+    document.getElementById('monthSub').textContent =
+      'Suma de todos los reportes diarios cargados de ese mes (' + monthData.days.length + ' día(s)). Se reinicia automáticamente al empezar un mes nuevo.';
+    renderKpis(monthData);
+    renderDaySelect(monthData);
+    renderTrendChart(monthData);
+    renderPaymentChart(monthData);
+    renderCategoryChart(monthData, daySelect.value);
+    renderDayTable(monthData);
   }
 
   function renderKpis(data){
@@ -992,17 +1018,17 @@
     th.addEventListener('click', () => {
       const key = th.getAttribute('data-key');
       if (daySortKey === key) daySortDir *= -1; else { daySortKey = key; daySortDir = 1; }
-      if (lastData) renderDayTable(lastData);
+      if (lastMonthData) renderDayTable(lastMonthData);
     });
   });
 
-  daySelect.addEventListener('change', () => { if (lastData) renderCategoryChart(lastData, daySelect.value); });
+  daySelect.addEventListener('change', () => { if (lastMonthData) renderCategoryChart(lastMonthData, daySelect.value); });
 
   document.querySelectorAll('#metricToggle .pill').forEach(btn => {
     btn.addEventListener('click', () => {
       categoryMetric = btn.getAttribute('data-metric');
       document.querySelectorAll('#metricToggle .pill').forEach(b => b.classList.toggle('active', b === btn));
-      if (lastData) renderCategoryChart(lastData, daySelect.value);
+      if (lastMonthData) renderCategoryChart(lastMonthData, daySelect.value);
     });
   });
 
