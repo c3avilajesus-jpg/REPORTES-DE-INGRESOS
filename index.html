@@ -143,7 +143,7 @@
 
   .controls-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:12px; }
   .controls-row > *:first-child { margin-right:auto; }
-  select.dim {
+  select.dim, input.dim {
     font: inherit; font-size:13px; padding:6px 10px; border-radius:8px;
     border:1px solid var(--border); background: var(--surface-1); color: var(--text-primary);
   }
@@ -223,10 +223,6 @@
     <button class="btn secondary hidden" id="shareBtn">Generar versión para compartir</button>
     <div id="warnings"></div>
   </div>
-  <div id="snapshotBanner" class="panel hidden" style="border-left:4px solid var(--series-4); background:rgba(232,205,122,0.16);">
-    <strong>Reporte de solo lectura</strong> — generado el <span id="snapshotDate"></span>. Los datos no se actualizan automáticamente; para ver la información en vivo, se necesita el dashboard conectado a la carpeta de reportes.
-  </div>
-
   <div id="unsupportedState" class="panel hidden">
     <h3>Tu navegador no soporta acceso a carpetas locales</h3>
     <p>Abre este archivo en <b>Google Chrome</b> o <b>Microsoft Edge</b> (de escritorio) para conectar la carpeta de reportes automáticamente.</p>
@@ -238,8 +234,31 @@
   </div>
 
   <div id="dashboard" class="hidden">
-    <div class="section-title-row"><span class="dot" style="background:var(--series-1)"></span><h2 class="section-title" id="monthTitle">Acumulado del mes</h2></div>
-    <p class="section-sub" id="monthSub"></p>
+    <div class="panel" id="viewControls">
+      <div class="controls-row">
+        <div class="section-title-row" style="margin-bottom:0;"><span class="dot" style="background:var(--series-1)"></span><h2 class="section-title" id="viewTitle">Acumulado total</h2></div>
+        <div class="pill-toggle" id="viewModeToggle">
+          <button class="pill active" data-mode="all" type="button">Acumulado total</button>
+          <button class="pill" data-mode="day" type="button">Día específico</button>
+          <button class="pill" data-mode="range" type="button">Rango de fechas</button>
+        </div>
+      </div>
+      <p class="section-sub" id="viewSub" style="margin-bottom:0;"></p>
+      <div id="dayPickerRow" class="controls-row hidden" style="margin-top:10px; margin-bottom:0;">
+        <label style="font-size:13px;color:var(--text-secondary); display:flex; align-items:center; gap:6px;">Día:
+          <input type="date" id="dayPicker" class="dim">
+        </label>
+      </div>
+      <div id="rangePickerRow" class="controls-row hidden" style="margin-top:10px; margin-bottom:0;">
+        <label style="font-size:13px;color:var(--text-secondary); display:flex; align-items:center; gap:6px;">Del:
+          <input type="date" id="rangeFromPicker" class="dim">
+        </label>
+        <label style="font-size:13px;color:var(--text-secondary); display:flex; align-items:center; gap:6px;">Al:
+          <input type="date" id="rangeToPicker" class="dim">
+        </label>
+        <button class="btn" id="applyRangeBtn" type="button">Aplicar</button>
+      </div>
+    </div>
     <section class="kpi-grid" id="kpiGrid"></section>
 
     <div class="panel" style="margin-top:18px;">
@@ -312,7 +331,7 @@
   <footer>Generado localmente en tu navegador — ningún dato sale de tu computadora.</footer>
 </div>
 
-<script>window.__EMBEDDED_DATA__ = {"days": [{"date": "2026-07-27", "files": ["27 JULIO REPORTE INGRESOS.xlsx"], "transactions": 357, "noshows": 13, "pax": 1030.0, "fxAvg": 18.583551951219516, "mxnTotal": 1191257.579388, "usdTotal": 31197.44, "mxnEquivalent": 1782899.9489672685, "payment": {"efectivo": 366619.00048726826, "tarjeta": 1230754.8196, "transferencia": 0.0, "cuentasPorCobrar": 7555.88888, "pagosLinea": 48507.28, "anticipos": 129462.96}, "categoryRevenue": {"AI HALF": 305150.6213, "COMBO": 689625.065495805, "RZR": 305264.58379999996, "AI 6 HOURS": 2250.0, "CAMELLOS": 185758.77977999998, "AI FULL": 43995.020000000004, "MOTOS": 128467.11859146341, "TIROLESA": 5660.0, "CABALLOS": 33924.0, "PREMIUM": 36949.759999999995, "COMBO3X1": 45855.0}, "categories": {"AI HALF": 156.0, "COMBO": 428.0, "RZR": 151.0, "AI 6 HOURS": 1.0, "CAMELLOS": 133.0, "AI FULL": 8.0, "MOTOS": 86.0, "TIROLESA": 11.0, "CABALLOS": 29.0, "PREMIUM": 6.0, "COMBO3X1": 21.0}}], "fileCount": 1, "generatedAt": "29/07/2026 21:35 UTC"};</script>
+<script>window.__EMBEDDED_DATA__ = {"days": [{"date": "2026-07-27", "files": ["27 JULIO REPORTE INGRESOS.xlsx"], "transactions": 357, "noshows": 13, "pax": 1030.0, "fxAvg": 18.583551951219516, "mxnTotal": 1191257.579388, "usdTotal": 31197.44, "mxnEquivalent": 1782899.9489672685, "payment": {"efectivo": 366619.00048726826, "tarjeta": 1230754.8196, "transferencia": 0.0, "cuentasPorCobrar": 7555.88888, "pagosLinea": 48507.28, "anticipos": 129462.96}, "categoryRevenue": {"AI HALF": 305150.6213, "COMBO": 689625.065495805, "RZR": 305264.58379999996, "AI 6 HOURS": 2250.0, "CAMELLOS": 185758.77977999998, "AI FULL": 43995.020000000004, "MOTOS": 128467.11859146341, "TIROLESA": 5660.0, "CABALLOS": 33924.0, "PREMIUM": 36949.759999999995, "COMBO3X1": 45855.0}, "categories": {"AI HALF": 156.0, "COMBO": 428.0, "RZR": 151.0, "AI 6 HOURS": 1.0, "CAMELLOS": 133.0, "AI FULL": 8.0, "MOTOS": 86.0, "TIROLESA": 11.0, "CABALLOS": 29.0, "PREMIUM": 6.0, "COMBO3X1": 21.0}}], "fileCount": 1, "generatedAt": "29/07/2026 22:10 UTC"};</script>
 
 <script>
 (function(){
@@ -321,7 +340,11 @@
   // ---------- state ----------
   let dirHandle = null;
   let lastData = null; // { days: [...], categoriesByDay: {date: {cat:pax}}, categoriesGlobal: {cat:pax} }
-  let lastMonthData = null; // lastData.days filtrado al mes calendario más reciente (lo que se muestra en pantalla)
+  let lastViewData = null; // lastData.days filtrado según el modo de vista elegido (lo que se muestra en pantalla)
+  let viewMode = 'all'; // 'all' | 'day' | 'range'
+  let selectedDay = null;
+  let rangeFrom = null, rangeTo = null;
+  let datePickersInitialized = false;
   let daySortKey = 'date', daySortDir = -1;
   let categoryMetric = 'revenue'; // 'pax' | 'revenue' — revenue shown first, per request
 
@@ -362,20 +385,49 @@
     return n.toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2});
   }
   function fmtInt(n){ return Math.round(n).toLocaleString('es-MX'); }
-  function fmtMonthLabel(ym){
-    const [y,m] = ym.split('-');
-    const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-    return meses[parseInt(m,10)-1] + ' ' + y;
+  // ---------- filtro de vista: acumulado total / día específico / rango de fechas ----------
+  function computeDateBounds(days){
+    let min = days[0].date, max = days[0].date;
+    for (const d of days) { if (d.date < min) min = d.date; if (d.date > max) max = d.date; }
+    return { min, max };
   }
-  // Acumula solo los días del mes calendario más reciente presente en los datos,
-  // para que el dashboard muestre el "acumulado del mes" y se reinicie solo al
-  // empezar un mes nuevo (en vez de sumar todo el histórico para siempre).
-  function filterToCurrentMonth(days){
-    if (!days || !days.length) return days;
-    let maxDate = days[0].date;
-    for (const d of days) if (d.date > maxDate) maxDate = d.date;
-    const ym = maxDate.slice(0,7);
-    return { ym, days: days.filter(d => d.date.slice(0,7) === ym) };
+  function setupDatePickers(days){
+    if (!days || !days.length || datePickersInitialized) return;
+    const { min, max } = computeDateBounds(days);
+    [dayPicker, rangeFromPicker, rangeToPicker].forEach(el => { el.min = min; el.max = max; });
+    dayPicker.value = max;
+    rangeFromPicker.value = min;
+    rangeToPicker.value = max;
+    selectedDay = max;
+    rangeFrom = min; rangeTo = max;
+    datePickersInitialized = true;
+  }
+  function getFilteredView(days){
+    if (!days || !days.length) return { label: 'Acumulado total', sub: 'No hay datos.', days: [] };
+    if (viewMode === 'day') {
+      const day = selectedDay || days[days.length-1].date;
+      const filtered = days.filter(d => d.date === day);
+      return {
+        label: 'Día: ' + fmtDateDisplay(day),
+        sub: filtered.length ? 'Datos del ' + fmtDateDisplay(day) + '.' : 'No hay ningún reporte cargado para ese día.',
+        days: filtered
+      };
+    }
+    if (viewMode === 'range') {
+      const from = rangeFrom, to = rangeTo;
+      const filtered = days.filter(d => (!from || d.date >= from) && (!to || d.date <= to));
+      const fromLabel = from ? fmtDateDisplay(from) : '…', toLabel = to ? fmtDateDisplay(to) : '…';
+      return {
+        label: 'Rango: ' + fromLabel + ' – ' + toLabel,
+        sub: filtered.length + ' día(s) en ese rango.',
+        days: filtered
+      };
+    }
+    return {
+      label: 'Acumulado total',
+      sub: 'Suma de todos los reportes diarios cargados hasta ahora (' + days.length + ' día(s)).',
+      days
+    };
   }
 
   // ---------- IndexedDB handle persistence ----------
@@ -415,13 +467,19 @@
   const csvBtn = document.getElementById('csvBtn');
   const csvSummaryBtn = document.getElementById('csvSummaryBtn');
   const shareBtn = document.getElementById('shareBtn');
-  const snapshotBanner = document.getElementById('snapshotBanner');
-  const snapshotDate = document.getElementById('snapshotDate');
   const warningsEl = document.getElementById('warnings');
   const unsupportedState = document.getElementById('unsupportedState');
   const emptyState = document.getElementById('emptyState');
   const dashboard = document.getElementById('dashboard');
   const daySelect = document.getElementById('daySelect');
+  const viewTitle = document.getElementById('viewTitle');
+  const viewSub = document.getElementById('viewSub');
+  const dayPickerRow = document.getElementById('dayPickerRow');
+  const rangePickerRow = document.getElementById('rangePickerRow');
+  const dayPicker = document.getElementById('dayPicker');
+  const rangeFromPicker = document.getElementById('rangeFromPicker');
+  const rangeToPicker = document.getElementById('rangeToPicker');
+  const applyRangeBtn = document.getElementById('applyRangeBtn');
 
   function setStatus(t){ statusText.innerHTML = t; }
 
@@ -674,18 +732,18 @@
 
   // ---------- render orchestration ----------
   function renderAll(data){
-    const filtered = filterToCurrentMonth(data.days);
-    const monthData = { days: filtered.days, fileCount: data.fileCount };
-    lastMonthData = monthData;
-    document.getElementById('monthTitle').textContent = 'Acumulado de ' + fmtMonthLabel(filtered.ym);
-    document.getElementById('monthSub').textContent =
-      'Suma de todos los reportes diarios cargados de ese mes (' + monthData.days.length + ' día(s)). Se reinicia automáticamente al empezar un mes nuevo.';
-    renderKpis(monthData);
-    renderDaySelect(monthData);
-    renderTrendChart(monthData);
-    renderPaymentChart(monthData);
-    renderCategoryChart(monthData, daySelect.value);
-    renderDayTable(monthData);
+    setupDatePickers(data.days);
+    const view = getFilteredView(data.days);
+    const viewData = { days: view.days, fileCount: data.fileCount };
+    lastViewData = viewData;
+    viewTitle.textContent = view.label;
+    viewSub.textContent = view.sub;
+    renderKpis(viewData);
+    renderDaySelect(viewData);
+    renderTrendChart(viewData);
+    renderPaymentChart(viewData);
+    renderCategoryChart(viewData, daySelect.value);
+    renderDayTable(viewData);
   }
 
   function renderKpis(data){
@@ -1018,18 +1076,38 @@
     th.addEventListener('click', () => {
       const key = th.getAttribute('data-key');
       if (daySortKey === key) daySortDir *= -1; else { daySortKey = key; daySortDir = 1; }
-      if (lastMonthData) renderDayTable(lastMonthData);
+      if (lastViewData) renderDayTable(lastViewData);
     });
   });
 
-  daySelect.addEventListener('change', () => { if (lastMonthData) renderCategoryChart(lastMonthData, daySelect.value); });
+  daySelect.addEventListener('change', () => { if (lastViewData) renderCategoryChart(lastViewData, daySelect.value); });
 
   document.querySelectorAll('#metricToggle .pill').forEach(btn => {
     btn.addEventListener('click', () => {
       categoryMetric = btn.getAttribute('data-metric');
       document.querySelectorAll('#metricToggle .pill').forEach(b => b.classList.toggle('active', b === btn));
-      if (lastMonthData) renderCategoryChart(lastMonthData, daySelect.value);
+      if (lastViewData) renderCategoryChart(lastViewData, daySelect.value);
     });
+  });
+
+  // ---------- controles de vista: acumulado total / día específico / rango ----------
+  document.querySelectorAll('#viewModeToggle .pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      viewMode = btn.getAttribute('data-mode');
+      document.querySelectorAll('#viewModeToggle .pill').forEach(b => b.classList.toggle('active', b === btn));
+      dayPickerRow.classList.toggle('hidden', viewMode !== 'day');
+      rangePickerRow.classList.toggle('hidden', viewMode !== 'range');
+      if (lastData) renderAll(lastData);
+    });
+  });
+  dayPicker.addEventListener('change', () => {
+    selectedDay = dayPicker.value;
+    if (lastData) renderAll(lastData);
+  });
+  applyRangeBtn.addEventListener('click', () => {
+    rangeFrom = rangeFromPicker.value;
+    rangeTo = rangeToPicker.value;
+    if (lastData) renderAll(lastData);
   });
 
   // ---------- CSV export helpers ----------
@@ -1147,8 +1225,6 @@
       const snap = window.__EMBEDDED_DATA__;
       lastData = { days: snap.days || [], fileCount: snap.fileCount || 0 };
       document.getElementById('connectBar').classList.add('hidden');
-      snapshotBanner.classList.remove('hidden');
-      snapshotDate.textContent = snap.generatedAt || '';
       if (lastData.days.length) {
         emptyState.classList.add('hidden');
         dashboard.classList.remove('hidden');
