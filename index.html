@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de Ingresos Diarios</title>
+<style>
+  :root { color-scheme: light; }
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --success:        #006300;
+    --series-1: #2a78d6; /* blue - efectivo */
+    --series-2: #eb6834; /* orange - tarjeta */
+    --series-3: #1baf7a; /* aqua - transferencia */
+    --series-4: #eda100; /* yellow - cuentas por cobrar */
+    --series-5: #e87ba4; /* magenta - pagos en linea */
+    --series-6: #008300; /* green - anticipos */
+    --series-7: #4a3aa7; /* violet */
+    --series-8: #e34948; /* red */
+    --status-good:    #0ca30c;
+    --status-warning: #fab219;
+    --status-serious: #ec835a;
+    --status-critical:#d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --success:        #0ca30c;
+      --series-1: #3987e5;
+      --series-2: #d95926;
+      --series-3: #199e70;
+      --series-4: #c98500;
+      --series-5: #d55181;
+      --series-6: #008300;
+      --series-7: #9085e9;
+      --series-8: #e66767;
+      --status-good:    #0ca30c;
+      --status-warning: #fab219;
+      --status-serious: #ec835a;
+      --status-critical:#d03b3b;
+    }
+  }
+  * { box-sizing: border-box; }
+  html,body { margin:0; padding:0; }
+  body {
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .viz-root { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
+  .brand-strip {
+    height: 5px; margin: 0 -20px 24px;
+    background: linear-gradient(90deg, var(--series-1), var(--series-3) 35%, var(--series-7) 70%, var(--series-2));
+    border-radius: 0 0 6px 6px;
+  }
+  header { margin-bottom: 18px; display:flex; align-items:center; gap:14px; }
+  header .logo-badge {
+    width:40px; height:40px; border-radius:12px; flex:0 0 auto;
+    background: linear-gradient(135deg, var(--series-1), var(--series-3));
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:700; font-size:18px;
+    box-shadow: 0 4px 10px rgba(42,120,214,0.28);
+  }
+  header h1 { font-size: 22px; font-weight: 700; margin: 0 0 4px; }
+  header p { margin: 0; color: var(--text-secondary); font-size: 14px; }
+
+  .panel {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+  }
+
+  .section-title-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+  .section-title-row .dot { width:10px; height:10px; border-radius:3px; flex:0 0 auto; }
+  .section-title-row h2.section-title { margin:0; }
+
+  #connectBar { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+  #connectBar .status { font-size:13px; color: var(--text-secondary); flex: 1 1 260px; }
+  #connectBar .status strong { color: var(--text-primary); }
+  button.btn {
+    font: inherit; font-size: 13.5px; font-weight: 600;
+    padding: 8px 14px; border-radius: 8px; cursor:pointer;
+    border: 1px solid var(--border); background: var(--series-1); color:#fff;
+  }
+  button.btn.secondary { background: transparent; color: var(--text-primary); }
+  button.btn:disabled { opacity:.5; cursor:default; }
+  button.btn:hover:not(:disabled) { filter: brightness(1.06); }
+
+  #warnings { font-size:12.5px; color: var(--series-2); margin-top:8px; }
+  #warnings div { margin-top:2px; }
+
+  .kpi-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap:14px; }
+  .kpi {
+    position:relative; overflow:hidden;
+    background: var(--surface-1); border:1px solid var(--border); border-radius:12px;
+    padding:16px 16px 16px 18px;
+    border-left: 4px solid var(--accent, var(--series-1));
+  }
+  .kpi::before {
+    content:''; position:absolute; inset:0;
+    background: var(--accent, var(--series-1)); opacity: 0.06; pointer-events:none;
+  }
+  .kpi.hero { grid-column: span 2; }
+  .kpi .top-row { display:flex; align-items:center; justify-content:space-between; gap:8px; position:relative; }
+  .kpi .icon-badge {
+    width:26px; height:26px; border-radius:8px; flex:0 0 auto;
+    background: var(--accent, var(--series-1)); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700;
+  }
+  .kpi .label { font-size:12.5px; color: var(--text-secondary); margin-bottom:6px; position:relative; }
+  .kpi .value { font-size:24px; font-weight:600; font-variant-numeric: proportional-nums; position:relative; }
+  .kpi.hero .value { font-size:30px; }
+  .kpi .sub { font-size:11.5px; color: var(--text-muted); margin-top:4px; position:relative; }
+  @media (max-width: 640px) { .kpi.hero { grid-column: span 1; } }
+
+  h2.section-title { font-size:16px; font-weight:700; margin: 0 0 4px; }
+  p.section-sub { font-size:12.5px; color: var(--text-muted); margin: 0 0 14px; }
+
+  .legend { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:10px; font-size:12.5px; color: var(--text-secondary); }
+  .legend .item { display:flex; align-items:center; gap:6px; }
+  .legend .swatch { width:10px; height:10px; border-radius:2px; display:inline-block; }
+
+  .controls-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:12px; }
+  .controls-row > *:first-child { margin-right:auto; }
+  select.dim {
+    font: inherit; font-size:13px; padding:6px 10px; border-radius:8px;
+    border:1px solid var(--border); background: var(--surface-1); color: var(--text-primary);
+  }
+  .pill-toggle { display:inline-flex; background: rgba(128,128,128,0.10); border-radius:999px; padding:3px; gap:2px; }
+  .pill-toggle .pill {
+    font: inherit; font-size:12.5px; font-weight:600; padding:6px 14px; border-radius:999px;
+    border:none; background:transparent; color: var(--text-secondary); cursor:pointer;
+  }
+  .pill-toggle .pill.active { background: var(--series-1); color:#fff; }
+
+  svg.chart { width:100%; height:auto; display:block; overflow:visible; }
+  .grid-line { stroke: var(--gridline); stroke-width:1; }
+  .axis-line { stroke: var(--baseline); stroke-width:1; }
+  .axis-label { fill: var(--text-muted); font-size:11px; font-variant-numeric: tabular-nums; }
+  .bar-seg { }
+  .hover-rect { fill: transparent; }
+  .tooltip {
+    position:absolute; pointer-events:none; z-index:20;
+    background: var(--text-primary); color: var(--surface-1);
+    font-size:12px; line-height:1.45; padding:8px 10px; border-radius:8px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    max-width: 240px; opacity:0; transition: opacity .08s ease;
+  }
+  .tooltip.show { opacity:1; }
+  .tooltip b { display:block; margin-bottom:2px; }
+  .chart-wrap { position:relative; }
+
+  table.data-table { width:100%; border-collapse: collapse; font-size:13px; }
+  table.data-table th, table.data-table td {
+    text-align:right; padding:8px 10px; border-bottom:1px solid var(--gridline);
+    font-variant-numeric: tabular-nums;
+  }
+  table.data-table th:first-child, table.data-table td:first-child,
+  table.data-table th:nth-child(2), table.data-table td:nth-child(2) { text-align:left; font-variant-numeric: normal; }
+  table.data-table thead tr { background: linear-gradient(90deg, rgba(42,120,214,0.08), rgba(27,175,122,0.05)); }
+  table.data-table th { color: var(--text-secondary); font-weight:600; font-size:12px; cursor:pointer; user-select:none; border-bottom:2px solid var(--baseline); }
+  table.data-table th:hover { color: var(--series-1); }
+  table.data-table tbody tr:nth-child(even) { background: rgba(128,128,128,0.035); }
+  table.data-table tbody tr:hover { background: rgba(42,120,214,0.08); }
+  .table-scroll { overflow-x:auto; }
+  .cat-swatch { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:7px; }
+  table.data-table tr.total-row td {
+    font-weight:700; color: var(--text-primary);
+    border-top: 2px solid var(--baseline); border-bottom:none;
+    background: rgba(128,128,128,0.06);
+  }
+  table.data-table tr.total-row:hover { background: rgba(128,128,128,0.06); }
+
+  .two-col { display:grid; grid-template-columns: 1.3fr 1fr; gap:18px; }
+  @media (max-width: 860px) { .two-col { grid-template-columns: 1fr; } }
+
+  #emptyState, #unsupportedState { text-align:center; padding: 50px 20px; color: var(--text-secondary); }
+  #emptyState h3, #unsupportedState h3 { color: var(--text-primary); margin-bottom:8px; }
+  .hidden { display:none !important; }
+  footer { text-align:center; color: var(--text-muted); font-size:11.5px; margin-top: 30px; }
+  code { background: rgba(128,128,128,0.15); padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <div class="brand-strip"></div>
+  <header>
+    <div class="logo-badge">$</div>
+    <div>
+      <h1>Dashboard de Ingresos Diarios</h1>
+      <p>Lee automáticamente todos los reportes .xlsx de tu carpeta (hoja INGRESOS) — no subes ni copias ningún archivo, solo conectas la carpeta una vez.</p>
+    </div>
+  </header>
+
+  <div class="panel" id="connectBar">
+    <div class="status" id="statusText">Conectando…</div>
+    <button class="btn" id="selectBtn">Seleccionar carpeta</button>
+    <button class="btn secondary hidden" id="reconnectBtn">Reconectar carpeta</button>
+    <button class="btn secondary hidden" id="refreshBtn">Actualizar ahora</button>
+    <button class="btn secondary hidden" id="csvBtn">Exportar CSV (detalle por reserva)</button>
+    <button class="btn secondary hidden" id="csvSummaryBtn">Resumen por día (CSV)</button>
+    <button class="btn secondary hidden" id="shareBtn">Generar versión para compartir</button>
+    <div id="warnings"></div>
+  </div>
+  <div id="snapshotBanner" class="panel hidden" style="border-left:4px solid var(--series-4); background:rgba(237,161,0,0.07);">
+    <strong>Reporte de solo lectura</strong> — generado el <span id="snapshotDate"></span>. Los datos no se actualizan automáticamente; para ver la información en vivo, se necesita el dashboard conectado a la carpeta de reportes.
+  </div>
+
+  <div id="unsupportedState" class="panel hidden">
+    <h3>Tu navegador no soporta acceso a carpetas locales</h3>
+    <p>Abre este archivo en <b>Google Chrome</b> o <b>Microsoft Edge</b> (de escritorio) para conectar la carpeta de reportes automáticamente.</p>
+  </div>
+
+  <div id="emptyState" class="panel hidden">
+    <h3>Aún no hay datos</h3>
+    <p>Conecta la carpeta donde guardas los reportes diarios (archivos .xlsx con hoja <code>INGRESOS</code>) para ver el dashboard.</p>
+  </div>
+
+  <div id="dashboard" class="hidden">
+    <section class="kpi-grid" id="kpiGrid"></section>
+
+    <div class="panel" style="margin-top:18px;">
+      <div class="controls-row">
+        <div class="section-title-row" style="margin-bottom:0;"><span class="dot" style="background:linear-gradient(135deg,var(--series-1),var(--series-5),var(--series-7))"></span><h2 class="section-title">Ingreso por actividad (categoría de tour)</h2></div>
+        <div class="pill-toggle" id="metricToggle">
+          <button class="pill" data-metric="pax" type="button">Pax</button>
+          <button class="pill active" data-metric="revenue" type="button">Ingreso ($)</button>
+        </div>
+        <select class="dim" id="daySelect"></select>
+      </div>
+      <p class="section-sub" id="categorySub">Ingreso (equivalente en pesos) por categoría de tour — suma de todas las formas de pago de cada venta.</p>
+      <div class="two-col">
+        <div class="chart-wrap">
+          <svg class="chart" id="categoryChart" viewBox="0 0 640 360"></svg>
+          <div class="tooltip" id="categoryTooltip"></div>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="categoryTable">
+            <thead><tr><th>Categoría</th><th id="categoryValueHeader">Ingreso (MXN)</th><th>%</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-title-row"><span class="dot" style="background:var(--series-1)"></span><h2 class="section-title">Ingreso total (equivalente en pesos) por día</h2></div>
+      <p class="section-sub" id="trendSub"></p>
+      <div class="chart-wrap">
+        <svg class="chart" id="trendChart" viewBox="0 0 1000 260"></svg>
+        <div class="tooltip" id="trendTooltip"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-title-row"><span class="dot" style="background:linear-gradient(135deg,var(--series-1),var(--series-2),var(--series-6))"></span><h2 class="section-title">Desglose por forma de pago, por día</h2></div>
+      <p class="section-sub">Cada barra es un día; los montos en dólares se convierten a pesos con el tipo de cambio promedio reportado ese día.</p>
+      <div class="legend" id="paymentLegend"></div>
+      <div class="chart-wrap">
+        <svg class="chart" id="paymentChart" viewBox="0 0 1000 300"></svg>
+        <div class="tooltip" id="paymentTooltip"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-title-row"><span class="dot" style="background:var(--series-3)"></span><h2 class="section-title">Detalle por día</h2></div>
+      <p class="section-sub">Haz clic en un encabezado para ordenar.</p>
+      <div class="table-scroll">
+        <table class="data-table" id="dayTable">
+          <thead>
+            <tr>
+              <th data-key="date" style="text-align:left">Fecha</th>
+              <th data-key="files" style="text-align:left">Archivo(s)</th>
+              <th data-key="transactions">Registros</th>
+              <th data-key="noshows">No-shows</th>
+              <th data-key="pax">Pax</th>
+              <th data-key="mxnTotal">Pesos (MXN)</th>
+              <th data-key="usdTotal">Dólares (USD)</th>
+              <th data-key="fxAvg">Tipo cambio</th>
+              <th data-key="mxnEquivalent">Total equiv. (MXN)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer>Generado localmente en tu navegador — ningún dato sale de tu computadora.</footer>
+</div>
+
+<script>window.__EMBEDDED_DATA__ = {"days": [{"date": "2026-07-27", "files": ["27 JULIO REPORTE INGRESOS.xlsx"], "transactions": 357, "noshows": 13, "pax": 1030.0, "fxAvg": 18.583551951219516, "mxnTotal": 1191257.579388, "usdTotal": 31197.44, "mxnEquivalent": 1782899.9489672685, "payment": {"efectivo": 366619.00048726826, "tarjeta": 1230754.8196, "transferencia": 0.0, "cuentasPorCobrar": 7555.88888, "pagosLinea": 48507.28, "anticipos": 129462.96}, "categoryRevenue": {"AI HALF": 305150.6213, "COMBO": 689625.065495805, "RZR": 305264.58379999996, "AI 6 HOURS": 2250.0, "CAMELLOS": 185758.77977999998, "AI FULL": 43995.020000000004, "MOTOS": 128467.11859146341, "TIROLESA": 5660.0, "CABALLOS": 33924.0, "PREMIUM": 36949.759999999995, "COMBO3X1": 45855.0}, "categories": {"AI HALF": 156.0, "COMBO": 428.0, "RZR": 151.0, "AI 6 HOURS": 1.0, "CAMELLOS": 133.0, "AI FULL": 8.0, "MOTOS": 86.0, "TIROLESA": 11.0, "CABALLOS": 29.0, "PREMIUM": 6.0, "COMBO3X1": 21.0}}], "fileCount": 1, "generatedAt": "29 de julio de 2026, 18:05 UTC"};</script>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- state ----------
+  let dirHandle = null;
+  let lastData = null; // { days: [...], categoriesByDay: {date: {cat:pax}}, categoriesGlobal: {cat:pax} }
+  let daySortKey = 'date', daySortDir = -1;
+  let categoryMetric = 'revenue'; // 'pax' | 'revenue' — revenue shown first, per request
+
+  // ---------- utils ----------
+  function normalize(s){
+    if (s == null) return '';
+    return String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').trim().replace(/\s+/g,' ').toUpperCase();
+  }
+  function num(v){
+    if (v == null || v === '') return 0;
+    if (typeof v === 'number') return isFinite(v) ? v : 0;
+    const n = parseFloat(String(v).replace(/,/g,''));
+    return isNaN(n) ? 0 : n;
+  }
+  function extractNumbers(v){
+    if (v == null) return [];
+    const s = String(v);
+    const m = s.match(/\d+(\.\d+)?/g);
+    return m ? m.map(Number) : [];
+  }
+  function fmtDateFromCell(d){
+    if (!(d instanceof Date) || isNaN(d)) return null;
+    const y = d.getUTCFullYear(), m = String(d.getUTCMonth()+1).padStart(2,'0'), day = String(d.getUTCDate()).padStart(2,'0');
+    return y + '-' + m + '-' + day;
+  }
+  function fmtDateDisplay(iso){
+    const [y,m,d] = iso.split('-');
+    const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    return d + ' ' + meses[parseInt(m,10)-1] + ' ' + y;
+  }
+  function fmtMoney(n, opts){
+    opts = opts || {};
+    const abs = Math.abs(n);
+    if (opts.compact) {
+      if (abs >= 1e6) return (n/1e6).toFixed(2) + 'M';
+      if (abs >= 1e3) return (n/1e3).toFixed(2) + 'K';
+    }
+    return n.toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  function fmtInt(n){ return Math.round(n).toLocaleString('es-MX'); }
+
+  // ---------- IndexedDB handle persistence ----------
+  const DB_NAME = 'ingresos-dashboard-db', STORE = 'handles';
+  function idbOpen(){
+    return new Promise((res,rej)=>{
+      const r = indexedDB.open(DB_NAME, 1);
+      r.onupgradeneeded = () => r.result.createObjectStore(STORE);
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  }
+  async function idbSet(key, val){
+    const db = await idbOpen();
+    return new Promise((res,rej)=>{
+      const tx = db.transaction(STORE,'readwrite');
+      tx.objectStore(STORE).put(val, key);
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  }
+  async function idbGet(key){
+    const db = await idbOpen();
+    return new Promise((res,rej)=>{
+      const tx = db.transaction(STORE,'readonly');
+      const rq = tx.objectStore(STORE).get(key);
+      rq.onsuccess = () => res(rq.result);
+      rq.onerror = () => rej(rq.error);
+    });
+  }
+
+  // ---------- DOM refs ----------
+  const statusText = document.getElementById('statusText');
+  const selectBtn = document.getElementById('selectBtn');
+  const reconnectBtn = document.getElementById('reconnectBtn');
+  const refreshBtn = document.getElementById('refreshBtn');
+  const csvBtn = document.getElementById('csvBtn');
+  const csvSummaryBtn = document.getElementById('csvSummaryBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const snapshotBanner = document.getElementById('snapshotBanner');
+  const snapshotDate = document.getElementById('snapshotDate');
+  const warningsEl = document.getElementById('warnings');
+  const unsupportedState = document.getElementById('unsupportedState');
+  const emptyState = document.getElementById('emptyState');
+  const dashboard = document.getElementById('dashboard');
+  const daySelect = document.getElementById('daySelect');
+
+  function setStatus(t){ statusText.innerHTML = t; }
+
+  // ---------- column mapping ----------
+  const COL_NAMES = {
+    dia: ['DIA'],
+    contrato: ['CONTRATO'],
+    rubroInicial: ['RUBRO INICIAL'],
+    rubroFinal: ['RUBRO FINAL'],
+    tourOriginal: ['TOUR ORIGINAL'],
+    tourFinal: ['TOUR FINAL'],
+    totalPax: ['TOTAL PAX'],
+    tipoCambio: ['TIPO DE CAMBIO'],
+    pesosCash: ['PESOS CASH'],
+    dolaresCash: ['DOLARES CASH'],
+    tarjetaMXN: ['TARJETA MXN'],
+    tarjetaUSD: ['TARJETA USD'],
+    transferencia: ['TRANSFERENCIA'],
+    cuentasPorCobrar: ['CUENTAS POR COBRAR'],
+    pagosLineaMXN: ['PAGOS EN LINEA MXN'],
+    pagosLineaUSD: ['PAGOS EN LINEA USD'],
+    aplicAnticipoMXN: ['APLICACION DE ANTICIPO MXN'],
+    aplicAnticipoUSD: ['APLICACION DE ANTICIPO USD'],
+    anticipoMXN: ['ANTICIPO MXN'],
+    anticipoUSD: ['ANTICIPO USD']
+  };
+
+  function buildColIndex(headerRow){
+    const map = {};
+    (headerRow || []).forEach((h, i) => {
+      const key = normalize(h);
+      if (!key) return;
+      (map[key] = map[key] || []).push(i);
+    });
+    const idx = {};
+    Object.keys(COL_NAMES).forEach(k => {
+      const candidates = COL_NAMES[k];
+      let found = -1;
+      for (const c of candidates) {
+        const norm = normalize(c);
+        if (map[norm]) {
+          const arr = map[norm];
+          found = (k === 'totalPax') ? arr[arr.length-1] : arr[0];
+          break;
+        }
+      }
+      idx[k] = found;
+    });
+    return idx;
+  }
+
+  function isBlankRow(row, idx){
+    const a = row[idx.rubroInicial], b = row[idx.contrato], c = row[idx.dia];
+    return (a == null || a === '') && (b == null || b === '') && (c == null || c === '');
+  }
+
+  // ---------- parse one sheet into per-day buckets ----------
+  function newBucket(date){
+    return {
+      date, files: new Set(),
+      transactions: 0, noshows: 0, pax: 0,
+      pesosCash:0, dolaresCash:0, tarjetaMXN:0, tarjetaUSD:0, transferencia:0,
+      cuentasPorCobrar:0, pagosLineaMXN:0, pagosLineaUSD:0, anticipoMXN:0, anticipoUSD:0,
+      fxSamples: [], categories: {}, reservations: []
+    };
+  }
+
+  function processSheet(sheet, fileName, dayBuckets, warnings){
+    const rows = XLSX.utils.sheet_to_json(sheet, {header:1, raw:true, defval:null, blankrows:false});
+    if (rows.length < 3) { warnings.push(fileName + ': hoja sin datos'); return; }
+    const headerRow = rows[1];
+    const idx = buildColIndex(headerRow);
+    if (idx.dia === -1) { warnings.push(fileName + ': no se encontró la columna DIA'); return; }
+    const dataRows = rows.slice(2);
+
+    // determine the report date for this file: mode of DIA values
+    const dateCounts = {};
+    dataRows.forEach(row => {
+      if (isBlankRow(row, idx)) return;
+      const dv = row[idx.dia];
+      const key = fmtDateFromCell(dv);
+      if (key) dateCounts[key] = (dateCounts[key]||0) + 1;
+    });
+    let fileDate = null, best = 0;
+    Object.keys(dateCounts).forEach(k => { if (dateCounts[k] > best) { best = dateCounts[k]; fileDate = k; } });
+    if (!fileDate) { warnings.push(fileName + ': no se pudo determinar la fecha del reporte'); return; }
+
+    let bucket = dayBuckets[fileDate];
+    if (!bucket) { bucket = newBucket(fileDate); dayBuckets[fileDate] = bucket; }
+    bucket.files.add(fileName);
+
+    dataRows.forEach(row => {
+      if (isBlankRow(row, idx)) return;
+      bucket.transactions++;
+      const contratoRaw = row[idx.contrato];
+      const isNoShow = typeof contratoRaw === 'string' && normalize(contratoRaw) === 'NO SHOW';
+      if (isNoShow) bucket.noshows++;
+
+      bucket.pax += num(row[idx.totalPax]);
+      bucket.pesosCash += num(row[idx.pesosCash]);
+      bucket.dolaresCash += num(row[idx.dolaresCash]);
+      bucket.tarjetaMXN += num(row[idx.tarjetaMXN]);
+      bucket.tarjetaUSD += num(row[idx.tarjetaUSD]);
+      bucket.transferencia += num(row[idx.transferencia]);
+      bucket.cuentasPorCobrar += num(row[idx.cuentasPorCobrar]);
+      bucket.pagosLineaMXN += num(row[idx.pagosLineaMXN]);
+      bucket.pagosLineaUSD += num(row[idx.pagosLineaUSD]);
+      bucket.anticipoMXN += num(row[idx.aplicAnticipoMXN]) + num(row[idx.anticipoMXN]);
+      bucket.anticipoUSD += num(row[idx.aplicAnticipoUSD]) + num(row[idx.anticipoUSD]);
+
+      const fxNums = extractNumbers(row[idx.tipoCambio]);
+      if (fxNums.length) bucket.fxSamples.push(...fxNums);
+
+      let cat = row[idx.rubroFinal];
+      if (cat == null || String(cat).trim() === '') cat = row[idx.rubroInicial];
+      if (cat == null || String(cat).trim() === '') cat = 'SIN CATEGORÍA';
+      cat = String(cat).trim();
+
+      let tour = row[idx.tourFinal];
+      if (tour == null || String(tour).trim() === '') tour = row[idx.tourOriginal];
+      tour = tour == null ? '' : String(tour).trim();
+
+      const rowMXN = num(row[idx.pesosCash]) + num(row[idx.tarjetaMXN]) + num(row[idx.transferencia]) +
+        num(row[idx.cuentasPorCobrar]) + num(row[idx.pagosLineaMXN]) + num(row[idx.aplicAnticipoMXN]) + num(row[idx.anticipoMXN]);
+      const rowUSD = num(row[idx.dolaresCash]) + num(row[idx.tarjetaUSD]) + num(row[idx.pagosLineaUSD]) +
+        num(row[idx.aplicAnticipoUSD]) + num(row[idx.anticipoUSD]);
+      const rowFx = fxNums.length ? (fxNums.reduce((a,c)=>a+c,0)/fxNums.length) : null;
+
+      bucket.reservations.push({
+        file: fileName,
+        contrato: contratoRaw == null ? '' : String(contratoRaw),
+        categoria: cat, tour: tour, pax: num(row[idx.totalPax]), noShow: isNoShow,
+        pesosCash: num(row[idx.pesosCash]), dolaresCash: num(row[idx.dolaresCash]),
+        tarjetaMXN: num(row[idx.tarjetaMXN]), tarjetaUSD: num(row[idx.tarjetaUSD]),
+        transferencia: num(row[idx.transferencia]), cuentasPorCobrar: num(row[idx.cuentasPorCobrar]),
+        pagosLineaMXN: num(row[idx.pagosLineaMXN]), pagosLineaUSD: num(row[idx.pagosLineaUSD]),
+        anticipoMXN: num(row[idx.aplicAnticipoMXN]) + num(row[idx.anticipoMXN]),
+        anticipoUSD: num(row[idx.aplicAnticipoUSD]) + num(row[idx.anticipoUSD]),
+        rowMXN, rowUSD, rowFx
+      });
+
+      if (!isNoShow) {
+        const pax = num(row[idx.totalPax]);
+        bucket.categories[cat] = (bucket.categories[cat] || 0) + pax;
+      }
+    });
+  }
+
+  function finalizeBucket(b){
+    // fxAvg is only a fallback, used when a specific reservation has no TIPO DE CAMBIO of its own
+    const fxAvg = b.fxSamples.length ? (b.fxSamples.reduce((a,c)=>a+c,0) / b.fxSamples.length) : 18.5;
+
+    // raw totals in each currency — never converted, so these stay exact regardless of exchange rate
+    const mxnTotal = b.pesosCash + b.tarjetaMXN + b.transferencia + b.cuentasPorCobrar + b.pagosLineaMXN + b.anticipoMXN;
+    const usdTotal = b.dolaresCash + b.tarjetaUSD + b.pagosLineaUSD + b.anticipoUSD;
+
+    // everything that requires a peso-equivalent conversion is built bottom-up from each reservation's
+    // OWN reported exchange rate (falling back to the day average only when a row has none), then summed —
+    // so the day total, the payment-method breakdown and the per-category revenue always add up exactly
+    // to the same figure, down to the peso.
+    const payment = { efectivo:0, tarjeta:0, transferencia:0, cuentasPorCobrar:0, pagosLinea:0, anticipos:0 };
+    const categoryRevenue = {};
+    let mxnEquivalent = 0;
+
+    const reservations = (b.reservations || []).map(r => {
+      const fx = r.rowFx != null ? r.rowFx : fxAvg;
+      const totalEquivalent = r.rowMXN + r.rowUSD * fx;
+      if (!r.noShow) {
+        mxnEquivalent += totalEquivalent;
+        payment.efectivo += r.pesosCash + r.dolaresCash * fx;
+        payment.tarjeta += r.tarjetaMXN + r.tarjetaUSD * fx;
+        payment.transferencia += r.transferencia;
+        payment.cuentasPorCobrar += r.cuentasPorCobrar;
+        payment.pagosLinea += r.pagosLineaMXN + r.pagosLineaUSD * fx;
+        payment.anticipos += r.anticipoMXN + r.anticipoUSD * fx;
+        categoryRevenue[r.categoria] = (categoryRevenue[r.categoria] || 0) + totalEquivalent;
+      }
+      return Object.assign({}, r, { date: b.date, fxUsed: fx, totalEquivalent });
+    });
+
+    return Object.assign({}, b, {
+      files: Array.from(b.files), fxAvg, mxnTotal, usdTotal, mxnEquivalent, payment, categoryRevenue, reservations
+    });
+  }
+
+  // ---------- scan folder ----------
+  async function scanAndRender(){
+    setStatus('Leyendo archivos…');
+    refreshBtn.disabled = true; selectBtn.disabled = true;
+    warningsEl.innerHTML = '';
+    const warnings = [];
+    let files = [];
+    try {
+      for await (const entry of dirHandle.values()) {
+        if (entry.kind === 'file' && /\.xlsx?$/i.test(entry.name) && !entry.name.startsWith('~$')) {
+          files.push(entry);
+        }
+      }
+    } catch(e) {
+      warnings.push('No se pudo listar la carpeta: ' + e.message);
+    }
+
+    const dayBuckets = {};
+    for (const fh of files) {
+      try {
+        const file = await fh.getFile();
+        const buf = await file.arrayBuffer();
+        const wb = XLSX.read(buf, {type:'array', cellDates:true});
+        const sheetName = wb.SheetNames.find(n => normalize(n).indexOf('INGRESO') !== -1);
+        if (!sheetName) { warnings.push(file.name + ': no tiene una hoja "INGRESOS"'); continue; }
+        processSheet(wb.Sheets[sheetName], file.name, dayBuckets, warnings);
+      } catch(e) {
+        warnings.push(fh.name + ': error al leer (' + e.message + ')');
+      }
+    }
+
+    const days = Object.keys(dayBuckets).sort().map(k => finalizeBucket(dayBuckets[k]));
+
+    lastData = { days, fileCount: files.length };
+
+    refreshBtn.disabled = false; selectBtn.disabled = false;
+    const now = new Date().toLocaleTimeString('es-MX');
+    setStatus('Carpeta conectada — <strong>' + files.length + '</strong> archivo(s) .xlsx, <strong>' + days.length + '</strong> día(s) — actualizado ' + now);
+    reconnectBtn.classList.add('hidden');
+    refreshBtn.classList.remove('hidden');
+
+    if (warnings.length) {
+      warningsEl.innerHTML = warnings.slice(0,8).map(w => '<div>⚠ ' + escapeHtml(w) + '</div>').join('');
+    }
+
+    if (!days.length) {
+      dashboard.classList.add('hidden');
+      emptyState.classList.remove('hidden');
+      csvBtn.classList.add('hidden');
+      csvSummaryBtn.classList.add('hidden');
+      shareBtn.classList.add('hidden');
+      return;
+    }
+    emptyState.classList.add('hidden');
+    dashboard.classList.remove('hidden');
+    csvBtn.classList.remove('hidden');
+    csvSummaryBtn.classList.remove('hidden');
+    shareBtn.classList.remove('hidden');
+    renderAll(lastData);
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  }
+
+  // ---------- render orchestration ----------
+  function renderAll(data){
+    renderKpis(data);
+    renderDaySelect(data);
+    renderTrendChart(data);
+    renderPaymentChart(data);
+    renderCategoryChart(data, daySelect.value);
+    renderDayTable(data);
+  }
+
+  function renderKpis(data){
+    const days = data.days;
+    const totalEquiv = days.reduce((s,d)=>s+d.mxnEquivalent,0);
+    const totalMXN = days.reduce((s,d)=>s+d.mxnTotal,0);
+    const totalUSD = days.reduce((s,d)=>s+d.usdTotal,0);
+    const totalTx = days.reduce((s,d)=>s+d.transactions,0);
+    const totalNoShow = days.reduce((s,d)=>s+d.noshows,0);
+    const totalPax = days.reduce((s,d)=>s+d.pax,0);
+    const ventas = totalTx - totalNoShow;
+    const avgTicket = ventas > 0 ? totalEquiv/ventas : 0;
+
+    const kpis = [
+      {label:'Ingreso total (equiv. MXN)', value:'$'+fmtMoney(totalEquiv,{compact:true}), sub: days.length+' día(s)', accent:'var(--series-1)', icon:'$', hero:true},
+      {label:'Total en pesos (MXN)', value:'$'+fmtMoney(totalMXN,{compact:true}), sub:'directo, sin conversión', accent:'var(--series-3)', icon:'MX'},
+      {label:'Total en dólares (USD)', value:'$'+fmtMoney(totalUSD,{compact:true}), sub:'directo, sin conversión', accent:'var(--series-7)', icon:'US'},
+      {label:'Ventas efectivas', value: fmtInt(ventas), sub: fmtInt(totalTx)+' registros totales', accent:'var(--status-good)', icon:'✓'},
+      {label:'No-shows', value: fmtInt(totalNoShow), sub:'reservas perdidas', accent:'var(--status-warning)', icon:'!'},
+      {label:'Pax totales', value: fmtInt(totalPax), sub:'suma de TOTAL PAX', accent:'var(--series-5)', icon:'P'},
+      {label:'Ticket promedio', value:'$'+fmtMoney(avgTicket,{compact:true}), sub:'por venta, equiv. MXN', accent:'var(--series-2)', icon:'⌀'}
+    ];
+    document.getElementById('kpiGrid').innerHTML = kpis.map(k =>
+      '<div class="kpi'+(k.hero?' hero':'')+'" style="--accent:'+k.accent+'">'+
+        '<div class="top-row"><div class="label">'+k.label+'</div><div class="icon-badge">'+k.icon+'</div></div>'+
+        '<div class="value">'+k.value+'</div><div class="sub">'+k.sub+'</div>'+
+      '</div>'
+    ).join('');
+  }
+
+  function renderDaySelect(data){
+    const cur = daySelect.value;
+    const opts = ['<option value="__all__">Todos los días</option>']
+      .concat(data.days.map(d => '<option value="'+d.date+'">'+fmtDateDisplay(d.date)+'</option>'));
+    daySelect.innerHTML = opts.join('');
+    if (cur && data.days.some(d=>d.date===cur)) daySelect.value = cur; else daySelect.value = '__all__';
+  }
+
+  // ---------- SVG chart helpers ----------
+  function svgEl(tag, attrs){
+    const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.keys(attrs||{}).forEach(k => el.setAttribute(k, attrs[k]));
+    return el;
+  }
+  function niceMax(v){
+    if (v <= 0) return 10;
+    const mag = Math.pow(10, Math.floor(Math.log10(v)));
+    const norm = v / mag;
+    let step;
+    if (norm <= 1) step = 1; else if (norm <= 2) step = 2; else if (norm <= 5) step = 5; else step = 10;
+    return step * mag;
+  }
+
+  // ----- trend line chart -----
+  function renderTrendChart(data){
+    const svg = document.getElementById('trendChart');
+    const tooltip = document.getElementById('trendTooltip');
+    svg.innerHTML = '';
+    const days = data.days;
+    document.getElementById('trendSub').textContent = days.length > 1
+      ? ('Del ' + fmtDateDisplay(days[0].date) + ' al ' + fmtDateDisplay(days[days.length-1].date))
+      : (days.length ? fmtDateDisplay(days[0].date) : '');
+
+    const W = 1000, H = 260, padL = 60, padR = 24, padT = 16, padB = 34;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const maxVal = niceMax(Math.max(...days.map(d=>d.mxnEquivalent), 1) * 1.15);
+
+    const defs = svgEl('defs', {});
+    const gradId = 'trendGrad';
+    const grad = svgEl('linearGradient', {id: gradId, x1:'0', y1:'0', x2:'0', y2:'1'});
+    const stop1 = svgEl('stop', {offset:'0%', 'stop-color':'var(--series-1)', 'stop-opacity':'0.28'});
+    const stop2 = svgEl('stop', {offset:'100%', 'stop-color':'var(--series-3)', 'stop-opacity':'0.02'});
+    grad.appendChild(stop1); grad.appendChild(stop2);
+    defs.appendChild(grad);
+    svg.appendChild(defs);
+
+    // gridlines + y axis
+    const ticks = 4;
+    for (let i=0;i<=ticks;i++){
+      const y = padT + plotH - (plotH * i/ticks);
+      const val = maxVal * i/ticks;
+      svg.appendChild(svgEl('line', {x1:padL, x2:W-padR, y1:y, y2:y, class:'grid-line'}));
+      const t = svgEl('text', {x:padL-8, y:y+4, class:'axis-label', 'text-anchor':'end'});
+      t.textContent = '$'+fmtMoney(val,{compact:true});
+      svg.appendChild(t);
+    }
+    svg.appendChild(svgEl('line', {x1:padL, x2:padL, y1:padT, y2:padT+plotH, class:'axis-line'}));
+    svg.appendChild(svgEl('line', {x1:padL, x2:W-padR, y1:padT+plotH, y2:padT+plotH, class:'axis-line'}));
+
+    const n = days.length;
+    const xFor = i => n === 1 ? padL + plotW/2 : padL + (plotW * i/(n-1));
+    const yFor = v => padT + plotH - (plotH * (v/maxVal));
+
+    // x labels (sparse)
+    const labelEvery = Math.max(1, Math.ceil(n / 8));
+    days.forEach((d,i) => {
+      if (i % labelEvery !== 0 && i !== n-1) return;
+      const t = svgEl('text', {x:xFor(i), y:H-8, class:'axis-label', 'text-anchor':'middle'});
+      t.textContent = fmtDateDisplay(d.date).replace(/ \d{4}$/,'');
+      svg.appendChild(t);
+    });
+
+    // area wash
+    if (n > 1) {
+      let path = 'M'+xFor(0)+','+(padT+plotH);
+      days.forEach((d,i)=> path += ' L'+xFor(i)+','+yFor(d.mxnEquivalent));
+      path += ' L'+xFor(n-1)+','+(padT+plotH)+' Z';
+      svg.appendChild(svgEl('path', {d:path, fill:'url(#'+gradId+')', stroke:'none'}));
+    }
+
+    // line
+    if (n > 1) {
+      let line = 'M'+xFor(0)+','+yFor(days[0].mxnEquivalent);
+      days.forEach((d,i)=>{ if(i>0) line += ' L'+xFor(i)+','+yFor(d.mxnEquivalent); });
+      svg.appendChild(svgEl('path', {d:line, fill:'none', stroke:'var(--series-1)', 'stroke-width':'2', 'stroke-linecap':'round', 'stroke-linejoin':'round'}));
+    }
+
+    // dots + hover targets
+    days.forEach((d,i)=>{
+      const cx = xFor(i), cy = yFor(d.mxnEquivalent);
+      svg.appendChild(svgEl('circle', {cx, cy, r:4, fill:'var(--series-1)', stroke:'var(--surface-1)', 'stroke-width':'2'}));
+      const hit = svgEl('circle', {cx, cy, r:12, class:'hover-rect'});
+      hit.addEventListener('mousemove', (ev)=>showTooltip(tooltip, svg, ev,
+        '<b>'+fmtDateDisplay(d.date)+'</b>Total equiv.: $'+fmtMoney(d.mxnEquivalent)+' MXN<br>Pesos: $'+fmtMoney(d.mxnTotal)+' · Dólares: $'+fmtMoney(d.usdTotal)));
+      hit.addEventListener('mouseleave', ()=>hideTooltip(tooltip));
+      svg.appendChild(hit);
+    });
+
+    // end label
+    if (n) {
+      const last = days[n-1];
+      const t = svgEl('text', {x:xFor(n-1), y:yFor(last.mxnEquivalent)-10, class:'axis-label', 'text-anchor':'end', fill:'var(--text-primary)', 'font-weight':'600'});
+      t.textContent = '$'+fmtMoney(last.mxnEquivalent,{compact:true});
+      svg.appendChild(t);
+    }
+  }
+
+  // ----- stacked payment method bar chart -----
+  const PAYMENT_KEYS = [
+    {key:'efectivo', label:'Efectivo', color:'var(--series-1)'},
+    {key:'tarjeta', label:'Tarjeta', color:'var(--series-2)'},
+    {key:'transferencia', label:'Transferencia', color:'var(--series-3)'},
+    {key:'cuentasPorCobrar', label:'Cuentas por cobrar', color:'var(--series-4)'},
+    {key:'pagosLinea', label:'Pagos en línea', color:'var(--series-5)'},
+    {key:'anticipos', label:'Anticipos', color:'var(--series-6)'}
+  ];
+
+  function renderPaymentChart(data){
+    const svg = document.getElementById('paymentChart');
+    const tooltip = document.getElementById('paymentTooltip');
+    svg.innerHTML = '';
+    document.getElementById('paymentLegend').innerHTML = PAYMENT_KEYS.map(p =>
+      '<span class="item"><span class="swatch" style="background:'+p.color+'"></span>'+p.label+'</span>'
+    ).join('');
+
+    const days = data.days;
+    const W = 1000, H = 300, padL = 60, padR = 24, padT = 16, padB = 40;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const totals = days.map(d => PAYMENT_KEYS.reduce((s,p)=>s+(d.payment[p.key]||0),0));
+    const maxVal = niceMax(Math.max(...totals, 1) * 1.15);
+
+    const ticks = 4;
+    for (let i=0;i<=ticks;i++){
+      const y = padT + plotH - (plotH*i/ticks);
+      const val = maxVal*i/ticks;
+      svg.appendChild(svgEl('line', {x1:padL, x2:W-padR, y1:y, y2:y, class:'grid-line'}));
+      const t = svgEl('text', {x:padL-8, y:y+4, class:'axis-label', 'text-anchor':'end'});
+      t.textContent = '$'+fmtMoney(val,{compact:true});
+      svg.appendChild(t);
+    }
+    svg.appendChild(svgEl('line', {x1:padL, x2:padL, y1:padT, y2:padT+plotH, class:'axis-line'}));
+    svg.appendChild(svgEl('line', {x1:padL, x2:W-padR, y1:padT+plotH, y2:padT+plotH, class:'axis-line'}));
+
+    const n = days.length;
+    const slot = plotW / n;
+    const barW = Math.min(40, slot * 0.55);
+    const gap = 2;
+
+    days.forEach((d,i)=>{
+      const cx = padL + slot*i + slot/2;
+      let yCursor = padT + plotH;
+      PAYMENT_KEYS.forEach(p => {
+        const v = d.payment[p.key] || 0;
+        if (v <= 0) return;
+        const segH = (v/maxVal) * plotH;
+        const y = yCursor - segH;
+        const rect = svgEl('rect', {
+          x: cx - barW/2, y: y, width: barW, height: Math.max(0, segH - gap),
+          rx: 4, fill: p.color
+        });
+        rect.addEventListener('mousemove', (ev)=>showTooltip(tooltip, svg, ev,
+          '<b>'+fmtDateDisplay(d.date)+' · '+p.label+'</b>$'+fmtMoney(v)+' MXN equiv.'));
+        rect.addEventListener('mouseleave', ()=>hideTooltip(tooltip));
+        svg.appendChild(rect);
+        yCursor = y - gap;
+      });
+      const t = svgEl('text', {x:cx, y:H-10, class:'axis-label', 'text-anchor':'middle'});
+      t.textContent = fmtDateDisplay(d.date).replace(/ \d{4}$/,'');
+      svg.appendChild(t);
+    });
+  }
+
+  // ----- category bar chart (horizontal) -----
+  const CATEGORY_COLORS = [
+    'var(--series-1)','var(--series-2)','var(--series-3)','var(--series-4)',
+    'var(--series-5)','var(--series-6)','var(--series-7)','var(--series-8)'
+  ];
+  const OTHER_COLOR = 'var(--text-muted)';
+
+  function renderCategoryChart(data, dayFilter){
+    const svg = document.getElementById('categoryChart');
+    const tooltip = document.getElementById('categoryTooltip');
+    svg.innerHTML = '';
+    const isRevenue = categoryMetric === 'revenue';
+
+    document.getElementById('categorySub').textContent = isRevenue
+      ? 'Ingreso (equivalente en pesos) por categoría de tour — suma de todas las formas de pago de cada venta.'
+      : 'Suma de pasajeros reportados (columna TOTAL PAX) por categoría de tour.';
+    document.getElementById('categoryValueHeader').textContent = isRevenue ? 'Ingreso (MXN)' : 'Pax';
+
+    const cats = {};
+    const relevantDays = (dayFilter && dayFilter !== '__all__') ? data.days.filter(d=>d.date===dayFilter) : data.days;
+    relevantDays.forEach(d => {
+      const src = isRevenue ? d.categoryRevenue : d.categories;
+      Object.keys(src || {}).forEach(c => { cats[c] = (cats[c]||0) + src[c]; });
+    });
+    let entries = Object.keys(cats).map(c=>({cat:c, val:cats[c]})).sort((a,b)=>b.val-a.val);
+    const total = entries.reduce((s,e)=>s+e.val,0);
+    let shown = entries.slice(0,8);
+    const rest = entries.slice(8);
+    if (rest.length){
+      shown.push({cat:'Otros ('+rest.length+')', val: rest.reduce((s,e)=>s+e.val,0)});
+    }
+
+    const fmtVal = v => isRevenue ? ('$'+fmtMoney(v,{compact:true})) : fmtInt(v);
+    const fmtValTable = v => isRevenue ? ('$'+fmtMoney(v)) : fmtInt(v);
+    const unitLabel = isRevenue ? '' : ' pax';
+
+    const W = 640, rowH = 32, padT = 10, padB = 10, padL = 150, padR = 50;
+    const H = padT + padB + rowH * Math.max(shown.length,1);
+    svg.setAttribute('viewBox', '0 0 '+W+' '+H);
+    const plotW = W - padL - padR;
+    const maxVal = niceMax(Math.max(...shown.map(s=>s.val),1) * 1.1);
+
+    shown.forEach((s,i)=>{
+      const y = padT + i*rowH;
+      const barW = plotW * (s.val/maxVal);
+      const isOther = /^Otros /.test(s.cat);
+      const color = isOther ? OTHER_COLOR : CATEGORY_COLORS[i % CATEGORY_COLORS.length];
+      const label = svgEl('text', {x:padL-10, y:y+rowH/2+4, class:'axis-label', 'text-anchor':'end'});
+      label.textContent = s.cat;
+      svg.appendChild(label);
+      const rect = svgEl('rect', {x:padL, y:y+6, width:Math.max(barW,2), height: rowH-12, rx:4, fill:color, opacity: isOther?0.6:1});
+      rect.addEventListener('mousemove', (ev)=>showTooltip(tooltip, svg, ev,
+        '<b>'+s.cat+'</b>'+fmtValTable(s.val)+unitLabel+(total?(' · '+((s.val/total)*100).toFixed(1)+'%'):'')));
+      rect.addEventListener('mouseleave', ()=>hideTooltip(tooltip));
+      svg.appendChild(rect);
+      const valLabel = svgEl('text', {x:padL+Math.max(barW,2)+6, y:y+rowH/2+4, class:'axis-label', fill:'var(--text-primary)'});
+      valLabel.textContent = fmtVal(s.val);
+      svg.appendChild(valLabel);
+    });
+
+    // table
+    const tbody = document.querySelector('#categoryTable tbody');
+    const bodyRows = entries.map((e,i) => {
+      const pct = total ? ((e.val/total)*100).toFixed(1) : '0.0';
+      const color = i < CATEGORY_COLORS.length ? CATEGORY_COLORS[i] : OTHER_COLOR;
+      return '<tr><td><span class="cat-swatch" style="background:'+color+'"></span>'+escapeHtml(e.cat)+'</td><td>'+fmtValTable(e.val)+'</td><td>'+pct+'%</td></tr>';
+    }).join('');
+    const totalRow = '<tr class="total-row"><td>Total</td><td>'+fmtValTable(total)+'</td><td>100.0%</td></tr>';
+    tbody.innerHTML = bodyRows + totalRow;
+  }
+
+  // ----- tooltip helpers -----
+  function showTooltip(tooltipEl, svg, ev, html){
+    const wrap = svg.closest('.chart-wrap');
+    const rect = wrap.getBoundingClientRect();
+    tooltipEl.innerHTML = html;
+    tooltipEl.classList.add('show');
+    let left = ev.clientX - rect.left + 14;
+    let top = ev.clientY - rect.top + 14;
+    tooltipEl.style.left = left+'px';
+    tooltipEl.style.top = top+'px';
+  }
+  function hideTooltip(tooltipEl){ tooltipEl.classList.remove('show'); }
+
+  // ----- day detail table -----
+  function renderDayTable(data){
+    const tbody = document.querySelector('#dayTable tbody');
+    let rows = data.days.slice();
+    rows.sort((a,b)=>{
+      let av = a[daySortKey], bv = b[daySortKey];
+      if (daySortKey === 'files') { av = a.files.join(','); bv = b.files.join(','); }
+      if (typeof av === 'string') return daySortDir * av.localeCompare(bv);
+      return daySortDir * (av - bv);
+    });
+    const bodyRows = rows.map(d =>
+      '<tr>'+
+      '<td>'+fmtDateDisplay(d.date)+'</td>'+
+      '<td>'+escapeHtml(d.files.join(', '))+'</td>'+
+      '<td>'+fmtInt(d.transactions)+'</td>'+
+      '<td>'+fmtInt(d.noshows)+'</td>'+
+      '<td>'+fmtInt(d.pax)+'</td>'+
+      '<td>$'+fmtMoney(d.mxnTotal)+'</td>'+
+      '<td>$'+fmtMoney(d.usdTotal)+'</td>'+
+      '<td>'+d.fxAvg.toFixed(2)+'</td>'+
+      '<td>$'+fmtMoney(d.mxnEquivalent)+'</td>'+
+      '</tr>'
+    ).join('');
+
+    const n = rows.length;
+    const sum = (key) => rows.reduce((s,d)=>s+d[key],0);
+    const avgFx = n ? rows.reduce((s,d)=>s+d.fxAvg,0)/n : 0;
+    const totalRow = '<tr class="total-row">'+
+      '<td>Total</td>'+
+      '<td>'+n+' día(s)</td>'+
+      '<td>'+fmtInt(sum('transactions'))+'</td>'+
+      '<td>'+fmtInt(sum('noshows'))+'</td>'+
+      '<td>'+fmtInt(sum('pax'))+'</td>'+
+      '<td>$'+fmtMoney(sum('mxnTotal'))+'</td>'+
+      '<td>$'+fmtMoney(sum('usdTotal'))+'</td>'+
+      '<td>'+avgFx.toFixed(2)+' prom.</td>'+
+      '<td>$'+fmtMoney(sum('mxnEquivalent'))+'</td>'+
+      '</tr>';
+
+    tbody.innerHTML = bodyRows + totalRow;
+  }
+
+  document.querySelectorAll('#dayTable th').forEach(th => {
+    th.addEventListener('click', () => {
+      const key = th.getAttribute('data-key');
+      if (daySortKey === key) daySortDir *= -1; else { daySortKey = key; daySortDir = 1; }
+      if (lastData) renderDayTable(lastData);
+    });
+  });
+
+  daySelect.addEventListener('change', () => { if (lastData) renderCategoryChart(lastData, daySelect.value); });
+
+  document.querySelectorAll('#metricToggle .pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      categoryMetric = btn.getAttribute('data-metric');
+      document.querySelectorAll('#metricToggle .pill').forEach(b => b.classList.toggle('active', b === btn));
+      if (lastData) renderCategoryChart(lastData, daySelect.value);
+    });
+  });
+
+  // ---------- CSV export helpers ----------
+  function downloadCsv(header, rows, filename){
+    const csv = [header].concat(rows).map(r => r.map(v => {
+      const s = String(v);
+      return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+    }).join(',')).join('\n');
+    const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // detailed export: one row per reservation, with every payment type broken out
+  csvBtn.addEventListener('click', () => {
+    if (!lastData) return;
+    const header = [
+      'Fecha','Archivo','Contrato','Categoria','Tour','Pax','NoShow',
+      'PesosCash','DolaresCash','TarjetaMXN','TarjetaUSD','Transferencia','CuentasPorCobrar',
+      'PagosLineaMXN','PagosLineaUSD','AnticipoMXN','AnticipoUSD','TipoCambioUsado',
+      'TotalMXN','TotalUSD','TotalEquivalenteMXN'
+    ];
+    const rows = [];
+    lastData.days.forEach(d => {
+      (d.reservations||[]).forEach(r => {
+        rows.push([
+          r.date, r.file, r.contrato, r.categoria, r.tour, r.pax, r.noShow ? 'SI' : 'NO',
+          r.pesosCash.toFixed(2), r.dolaresCash.toFixed(2), r.tarjetaMXN.toFixed(2), r.tarjetaUSD.toFixed(2),
+          r.transferencia.toFixed(2), r.cuentasPorCobrar.toFixed(2), r.pagosLineaMXN.toFixed(2), r.pagosLineaUSD.toFixed(2),
+          r.anticipoMXN.toFixed(2), r.anticipoUSD.toFixed(2), r.fxUsed.toFixed(3),
+          r.rowMXN.toFixed(2), r.rowUSD.toFixed(2), r.totalEquivalent.toFixed(2)
+        ]);
+      });
+    });
+    downloadCsv(header, rows, 'ingresos_detalle_por_reserva.csv');
+  });
+
+  // summary export: one row per day
+  csvSummaryBtn.addEventListener('click', () => {
+    if (!lastData) return;
+    const header = ['Fecha','Archivos','Registros','NoShows','Pax','PesosMXN','DolaresUSD','TipoCambioProm','TotalEquivMXN'];
+    const rows = lastData.days.map(d => [
+      d.date, d.files.join(' | '), d.transactions, d.noshows, d.pax,
+      d.mxnTotal.toFixed(2), d.usdTotal.toFixed(2), d.fxAvg.toFixed(2), d.mxnEquivalent.toFixed(2)
+    ]);
+    downloadCsv(header, rows, 'ingresos_resumen_por_dia.csv');
+  });
+
+  // ---------- share as static snapshot (anyone can open it, no folder needed) ----------
+  shareBtn.addEventListener('click', () => {
+    if (!lastData) return;
+
+    // reset transient UI state to sane defaults so the exported file boots consistently,
+    // regardless of what the current live view happens to be showing
+    const prevMetric = categoryMetric, prevDay = daySelect.value;
+    const prevSortKey = daySortKey, prevSortDir = daySortDir;
+    categoryMetric = 'pax'; daySortKey = 'date'; daySortDir = -1;
+    document.querySelectorAll('#metricToggle .pill').forEach(b => b.classList.toggle('active', b.getAttribute('data-metric') === 'pax'));
+    renderDaySelect(lastData); daySelect.value = '__all__';
+    renderAll(lastData);
+
+    const generatedAt = new Date().toLocaleString('es-MX');
+    // strip per-reservation row detail from the shared snapshot — it's only needed for CSV export,
+    // which isn't available in read-only mode, and leaving it out keeps the shared file smaller
+    const slimDays = lastData.days.map(d => { const c = Object.assign({}, d); delete c.reservations; return c; });
+    const snapshot = { days: slimDays, fileCount: lastData.fileCount, generatedAt };
+    let html = document.documentElement.outerHTML;
+    html = html.replace(/<script src="https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/xlsx\/[^"]*"><\/script>\s*/,'');
+    const payload = JSON.stringify(snapshot).replace(/</g, '\\u003c');
+    const inject = '<script>window.__EMBEDDED_DATA__ = ' + payload + ';<\/script>\n';
+    html = html.replace('<!--SNAPSHOT_DATA_INJECTION_POINT-->', inject);
+    const blob = new Blob([html], {type:'text/html;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = generatedAt.replace(/[^\d]/g,'').slice(0,12) || 'snapshot';
+    a.href = url; a.download = 'reporte_ingresos_' + stamp + '.html';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    // restore the live view to what the user was actually looking at
+    categoryMetric = prevMetric; daySortKey = prevSortKey; daySortDir = prevSortDir;
+    document.querySelectorAll('#metricToggle .pill').forEach(b => b.classList.toggle('active', b.getAttribute('data-metric') === prevMetric));
+    renderDaySelect(lastData); daySelect.value = prevDay;
+    renderAll(lastData);
+  });
+
+  // ---------- connect / permissions ----------
+  selectBtn.addEventListener('click', async () => {
+    try {
+      const handle = await window.showDirectoryPicker({ id: 'ingresos-folder', mode: 'read' });
+      dirHandle = handle;
+      await idbSet('folderHandle', handle);
+      await scanAndRender();
+    } catch (e) {
+      if (e && e.name !== 'AbortError') setStatus('No se pudo abrir la carpeta: ' + e.message);
+    }
+  });
+
+  reconnectBtn.addEventListener('click', async () => {
+    try {
+      const perm = await dirHandle.requestPermission({ mode: 'read' });
+      if (perm === 'granted') await scanAndRender();
+      else setStatus('Permiso de carpeta denegado.');
+    } catch (e) { setStatus('Error al reconectar: ' + e.message); }
+  });
+
+  refreshBtn.addEventListener('click', scanAndRender);
+
+  async function init(){
+    if (window.__EMBEDDED_DATA__) {
+      // static, shareable snapshot mode — data is embedded, no folder access needed
+      const snap = window.__EMBEDDED_DATA__;
+      lastData = { days: snap.days || [], fileCount: snap.fileCount || 0 };
+      document.getElementById('connectBar').classList.add('hidden');
+      snapshotBanner.classList.remove('hidden');
+      snapshotDate.textContent = snap.generatedAt || '';
+      if (lastData.days.length) {
+        emptyState.classList.add('hidden');
+        dashboard.classList.remove('hidden');
+        renderAll(lastData);
+      } else {
+        dashboard.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+      }
+      return;
+    }
+    if (!window.showDirectoryPicker) {
+      unsupportedState.classList.remove('hidden');
+      selectBtn.disabled = true;
+      setStatus('Navegador no compatible con acceso a carpetas locales.');
+      return;
+    }
+    try {
+      const handle = await idbGet('folderHandle');
+      if (handle) {
+        dirHandle = handle;
+        const perm = await handle.queryPermission({ mode: 'read' });
+        if (perm === 'granted') {
+          await scanAndRender();
+        } else {
+          setStatus('Carpeta guardada: <strong>' + handle.name + '</strong> — falta reconectar.');
+          reconnectBtn.classList.remove('hidden');
+        }
+      } else {
+        setStatus('Ninguna carpeta conectada todavía.');
+      }
+    } catch (e) {
+      setStatus('Ninguna carpeta conectada todavía.');
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
