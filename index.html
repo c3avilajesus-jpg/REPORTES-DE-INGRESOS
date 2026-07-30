@@ -269,7 +269,7 @@
         </div>
         <select class="dim" id="daySelect"></select>
       </div>
-      <p class="section-sub" id="categorySub">Ingreso (equivalente en pesos) por categoría de tour — suma de todas las formas de pago de cada venta.</p>
+      <p class="section-sub" id="categorySub">Ingreso base (equivalente en pesos) por categoría de tour — no incluye seguros ni extras (ver sección aparte).</p>
       <div class="two-col">
         <div class="chart-wrap">
           <svg class="chart" id="categoryChart" viewBox="0 0 640 360"></svg>
@@ -304,12 +304,19 @@
     </div>
 
     <div class="panel">
-      <div class="section-title-row"><span class="dot" style="background:linear-gradient(135deg,var(--series-2),var(--series-3),var(--series-8))"></span><h2 class="section-title">Ingreso por seguros y extras, por día</h2></div>
-      <p class="section-sub">Este dinero ya está incluido en el total de formas de pago (el ingreso base del tour, que es ~98% del total, no se grafica aquí para que estas categorías más pequeñas sí se alcancen a ver).</p>
-      <div class="legend" id="conceptLegend"></div>
-      <div class="chart-wrap">
-        <svg class="chart" id="conceptChart" viewBox="0 0 1000 300"></svg>
-        <div class="tooltip" id="conceptTooltip"></div>
+      <div class="section-title-row"><span class="dot" style="background:linear-gradient(135deg,var(--series-2),var(--series-3),var(--series-8))"></span><h2 class="section-title">Ingreso por seguros y extras</h2></div>
+      <p class="section-sub" id="extrasSub">Este dinero ya está incluido en el total de formas de pago y se resta de "Ingreso por actividad" según la reserva de la que viene, para no contarse dos veces.</p>
+      <div class="two-col">
+        <div class="chart-wrap">
+          <svg class="chart" id="extrasChart" viewBox="0 0 640 360"></svg>
+          <div class="tooltip" id="extrasTooltip"></div>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="extrasTable">
+            <thead><tr><th>Concepto</th><th>Ingreso (MXN)</th><th>%</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -340,7 +347,7 @@
   <footer>Generado localmente en tu navegador — ningún dato sale de tu computadora.</footer>
 </div>
 
-<script>window.__EMBEDDED_DATA__ = {"days": [{"date": "2026-07-27", "files": ["27 JULIO REPORTE INGRESOS.xlsx"], "transactions": 357, "noshows": 13, "pax": 1030.0, "fxAvg": 18.583551951219516, "mxnTotal": 1191257.579388, "usdTotal": 31197.44, "mxnEquivalent": 1782899.9489672685, "payment": {"efectivo": 366619.00048726826, "tarjeta": 1230754.8196, "transferencia": 0.0, "cuentasPorCobrar": 7555.88888, "pagosLinea": 48507.28, "anticipos": 129462.96}, "categoryRevenue": {"AI HALF": 305150.6213, "COMBO": 689625.065495805, "RZR": 305264.58379999996, "AI 6 HOURS": 2250.0, "CAMELLOS": 185758.77977999998, "AI FULL": 43995.020000000004, "MOTOS": 128467.11859146341, "TIROLESA": 5660.0, "CABALLOS": 33924.0, "PREMIUM": 36949.759999999995, "COMBO3X1": 45855.0}, "categories": {"AI HALF": 156.0, "COMBO": 428.0, "RZR": 151.0, "AI 6 HOURS": 1.0, "CAMELLOS": 133.0, "AI FULL": 8.0, "MOTOS": 86.0, "TIROLESA": 11.0, "CABALLOS": 29.0, "PREMIUM": 6.0, "COMBO3X1": 21.0}, "concept": {"base": 1746893.3489672684, "seguros": 10606.6, "extraUpgrade": 5354.0, "guiaPrivado": 14011.0, "transportePrivado": 215.0, "fotografias": 149.0, "cargoPrivadosPlus": 5671.0}}, {"date": "2026-07-28", "files": ["28 JULIO REPORTE DE INGRESOS.xlsx"], "transactions": 406, "noshows": 9, "pax": 944.0, "fxAvg": 18.478873648648648, "mxnTotal": 1303561.38533, "usdTotal": 20755.2, "mxnEquivalent": 1697539.8519966665, "payment": {"efectivo": 356641.69490666664, "tarjeta": 1098735.4373299999, "transferencia": 22155.0, "cuentasPorCobrar": 5930.33256, "pagosLinea": 44001.72, "anticipos": 170075.66720000003}, "categoryRevenue": {"COMBO": 559866.3373966665, "RZR": 419806.0562, "AI 6 HOURS": 48300.0, "COMBO3X1": 115193.0, "AI HALF": 198705.27839999998, "AI FULL": 2310.0, "CAMELLOS": 217564.18000000002, "MOTOS": 76710.0, "TIROLESA": 48610.0, "AI PREMIUM 4 HOURS": 8100.0, "KIDS CLUB": 0.0, "CABALLOS": 2375.0, "CANCELED": 0.0}, "categories": {"COMBO": 337.0, "RZR": 178.0, "AI 6 HOURS": 13.0, "COMBO3X1": 45.0, "AI HALF": 99.0, "AI FULL": 3.0, "CAMELLOS": 185.0, "MOTOS": 42.0, "TIROLESA": 27.0, "AI PREMIUM 4 HOURS": 4.0, "KIDS CLUB": 2.0, "CABALLOS": 9.0, "CANCELED": 0.0}, "concept": {"base": 1661623.9419966666, "seguros": 9666.6, "extraUpgrade": 6666.0, "guiaPrivado": 9276.0, "transportePrivado": 129.31, "fotografias": 0.0, "cargoPrivadosPlus": 10178.0}}], "fileCount": 2, "generatedAt": "30/07/2026 06:48 UTC"};</script>
+<script>window.__EMBEDDED_DATA__ = {"days": [{"date": "2026-07-27", "files": ["27 JULIO REPORTE INGRESOS.xlsx"], "transactions": 357, "noshows": 13, "pax": 1030.0, "fxAvg": 18.583551951219516, "mxnTotal": 1191257.579388, "usdTotal": 31197.44, "mxnEquivalent": 1782899.9489672685, "payment": {"efectivo": 366619.00048726826, "tarjeta": 1230754.8196, "transferencia": 0.0, "cuentasPorCobrar": 7555.88888, "pagosLinea": 48507.28, "anticipos": 129462.96}, "categoryRevenue": {"AI HALF": 299478.6213, "COMBO": 675290.465495805, "RZR": 297757.78380000003, "AI 6 HOURS": 2250.0, "CAMELLOS": 182729.77977999998, "AI FULL": 43496.020000000004, "MOTOS": 125872.11859146341, "TIROLESA": 5458.0, "CABALLOS": 33511.0, "PREMIUM": 36276.56, "COMBO3X1": 44773.0}, "categories": {"AI HALF": 156.0, "COMBO": 428.0, "RZR": 151.0, "AI 6 HOURS": 1.0, "CAMELLOS": 133.0, "AI FULL": 8.0, "MOTOS": 86.0, "TIROLESA": 11.0, "CABALLOS": 29.0, "PREMIUM": 6.0, "COMBO3X1": 21.0}, "concept": {"base": 1746893.3489672684, "seguros": 10606.6, "extraUpgrade": 5354.0, "guiaPrivado": 14011.0, "transportePrivado": 215.0, "fotografias": 149.0, "cargoPrivadosPlus": 5671.0}}, {"date": "2026-07-28", "files": ["28 JULIO REPORTE DE INGRESOS.xlsx"], "transactions": 406, "noshows": 9, "pax": 944.0, "fxAvg": 18.478873648648648, "mxnTotal": 1303561.38533, "usdTotal": 20755.2, "mxnEquivalent": 1697539.8519966665, "payment": {"efectivo": 356641.69490666664, "tarjeta": 1098735.4373299999, "transferencia": 22155.0, "cuentasPorCobrar": 5930.33256, "pagosLinea": 44001.72, "anticipos": 170075.66720000003}, "categoryRevenue": {"COMBO": 546130.7373966667, "RZR": 409427.7462, "AI 6 HOURS": 47526.0, "COMBO3X1": 112707.0, "AI HALF": 195446.27839999998, "AI FULL": 2310.0, "CAMELLOS": 214130.18000000002, "MOTOS": 75634.0, "TIROLESA": 48224.0, "AI PREMIUM 4 HOURS": 7713.0, "KIDS CLUB": 0.0, "CABALLOS": 2375.0, "CANCELED": 0.0}, "categories": {"COMBO": 337.0, "RZR": 178.0, "AI 6 HOURS": 13.0, "COMBO3X1": 45.0, "AI HALF": 99.0, "AI FULL": 3.0, "CAMELLOS": 185.0, "MOTOS": 42.0, "TIROLESA": 27.0, "AI PREMIUM 4 HOURS": 4.0, "KIDS CLUB": 2.0, "CABALLOS": 9.0, "CANCELED": 0.0}, "concept": {"base": 1661623.9419966666, "seguros": 9666.6, "extraUpgrade": 6666.0, "guiaPrivado": 9276.0, "transportePrivado": 129.31, "fotografias": 0.0, "cargoPrivadosPlus": 10178.0}}], "fileCount": 2, "generatedAt": "30/07/2026 06:57 UTC"};</script>
 
 <script>
 (function(){
@@ -682,7 +689,11 @@
         payment.cuentasPorCobrar += r.cuentasPorCobrar;
         payment.pagosLinea += r.pagosLineaMXN + r.pagosLineaUSD * fx;
         payment.anticipos += r.anticipoMXN + r.anticipoUSD * fx;
-        categoryRevenue[r.categoria] = (categoryRevenue[r.categoria] || 0) + totalEquivalent;
+        // seguros y extras de ESTA reserva se restan de lo que se le atribuye a su categoría de
+        // tour -- así "Ingreso por actividad" queda como ingreso base (tour) puro, y sumado a
+        // "Ingreso por seguros y extras" cuadra exactamente con el total por formas de pago.
+        const rNonBase = r.seguros + r.extraUpgrade + r.guiaPrivado + r.transportePrivado + r.fotografias + r.cargoPrivadosPlus;
+        categoryRevenue[r.categoria] = (categoryRevenue[r.categoria] || 0) + (totalEquivalent - rNonBase);
         concept.seguros += r.seguros;
         concept.extraUpgrade += r.extraUpgrade;
         concept.guiaPrivado += r.guiaPrivado;
@@ -777,7 +788,7 @@
     renderDaySelect(viewData);
     renderTrendChart(viewData);
     renderPaymentChart(viewData);
-    renderConceptChart(viewData);
+    renderExtrasChart(viewData, daySelect.value);
     renderCategoryChart(viewData, daySelect.value);
     renderDayTable(viewData);
   }
@@ -986,73 +997,62 @@
     });
   }
 
-  // ----- concept (tipo de ingreso) stacked bar chart -----
-  // NOTA: "base (tour)" se deja fuera de esta gráfica a propósito -- es ~98% del ingreso total
-  // y si se incluye en la misma escala, las barras de seguros/extras quedan invisibles (líneas
-  // de 1-2px). El "Ingreso total" ya se ve en la gráfica de tendencia de arriba; esta gráfica
-  // usa su propia escala para que seguros y cada tipo de extra sí se puedan leer.
-  const CONCEPT_KEYS = [
-    {key:'seguros', label:'Seguros', color:'var(--series-2)'},
-    {key:'extraUpgrade', label:'Extra por upgrade', color:'var(--series-3)'},
-    {key:'guiaPrivado', label:'Guía privado', color:'var(--series-4)'},
-    {key:'transportePrivado', label:'Transporte privado', color:'var(--series-5)'},
-    {key:'fotografias', label:'Fotografías', color:'var(--series-6)'},
-    {key:'cargoPrivadosPlus', label:'Privados plus', color:'var(--series-8)'}
+  // ----- seguros/extras ranked bar chart (mismo estilo que "Ingreso por actividad") -----
+  const EXTRAS_KEYS = [
+    {key:'seguros', label:'Seguros'},
+    {key:'extraUpgrade', label:'Extra por upgrade'},
+    {key:'guiaPrivado', label:'Guía privado'},
+    {key:'transportePrivado', label:'Transporte privado'},
+    {key:'fotografias', label:'Fotografías'},
+    {key:'cargoPrivadosPlus', label:'Privados plus'}
   ];
 
-  function renderConceptChart(data){
-    const svg = document.getElementById('conceptChart');
-    const tooltip = document.getElementById('conceptTooltip');
+  function renderExtrasChart(data, dayFilter){
+    const svg = document.getElementById('extrasChart');
+    const tooltip = document.getElementById('extrasTooltip');
     svg.innerHTML = '';
-    document.getElementById('conceptLegend').innerHTML = CONCEPT_KEYS.map(p =>
-      '<span class="item"><span class="swatch" style="background:'+p.color+'"></span>'+p.label+'</span>'
-    ).join('');
 
-    const days = data.days;
-    const W = 1000, H = 300, padL = 60, padR = 24, padT = 16, padB = 40;
-    const plotW = W - padL - padR, plotH = H - padT - padB;
-    const totals = days.map(d => CONCEPT_KEYS.reduce((s,p)=>s+((d.concept && d.concept[p.key])||0),0));
-    const maxVal = niceMax(Math.max(...totals, 1) * 1.15);
+    const relevantDays = (dayFilter && dayFilter !== '__all__') ? data.days.filter(d=>d.date===dayFilter) : data.days;
+    let entries = EXTRAS_KEYS.map(k => ({
+      cat: k.label,
+      val: relevantDays.reduce((s,d)=>s+((d.concept && d.concept[k.key])||0),0)
+    })).sort((a,b)=>b.val-a.val);
+    const total = entries.reduce((s,e)=>s+e.val,0);
 
-    const ticks = 4;
-    for (let i=0;i<=ticks;i++){
-      const y = padT + plotH - (plotH*i/ticks);
-      const val = maxVal*i/ticks;
-      svg.appendChild(svgEl('line', {x1:padL, x2:W-padR, y1:y, y2:y, class:'grid-line'}));
-      const t = svgEl('text', {x:padL-8, y:y+4, class:'axis-label', 'text-anchor':'end'});
-      t.textContent = '$'+fmtMoney(val,{compact:true});
-      svg.appendChild(t);
-    }
-    svg.appendChild(svgEl('line', {x1:padL, x2:padL, y1:padT, y2:padT+plotH, class:'axis-line'}));
-    svg.appendChild(svgEl('line', {x1:padL, x2:W-padR, y1:padT+plotH, y2:padT+plotH, class:'axis-line'}));
+    const fmtVal = v => '$'+fmtMoney(v,{compact:true});
+    const fmtValTable = v => '$'+fmtMoney(v);
 
-    const n = days.length;
-    const slot = plotW / n;
-    const barW = Math.min(40, slot * 0.55);
-    const gap = 2;
+    const W = 640, rowH = 32, padT = 10, padB = 10, padL = 150, padR = 50;
+    const H = padT + padB + rowH * Math.max(entries.length,1);
+    svg.setAttribute('viewBox', '0 0 '+W+' '+H);
+    const plotW = W - padL - padR;
+    const maxVal = niceMax(Math.max(...entries.map(s=>s.val),1) * 1.1);
 
-    days.forEach((d,i)=>{
-      const cx = padL + slot*i + slot/2;
-      let yCursor = padT + plotH;
-      CONCEPT_KEYS.forEach(p => {
-        const v = (d.concept && d.concept[p.key]) || 0;
-        if (v <= 0) return;
-        const segH = (v/maxVal) * plotH;
-        const y = yCursor - segH;
-        const rect = svgEl('rect', {
-          x: cx - barW/2, y: y, width: barW, height: Math.max(0, segH - gap),
-          rx: 4, fill: p.color
-        });
-        rect.addEventListener('mousemove', (ev)=>showTooltip(tooltip, svg, ev,
-          '<b>'+fmtDateDisplay(d.date)+' · '+p.label+'</b>$'+fmtMoney(v)+' MXN'));
-        rect.addEventListener('mouseleave', ()=>hideTooltip(tooltip));
-        svg.appendChild(rect);
-        yCursor = y - gap;
-      });
-      const t = svgEl('text', {x:cx, y:H-10, class:'axis-label', 'text-anchor':'middle'});
-      t.textContent = fmtDateDisplay(d.date).replace(/ \d{4}$/,'');
-      svg.appendChild(t);
+    entries.forEach((s,i)=>{
+      const y = padT + i*rowH;
+      const barW = plotW * (s.val/maxVal);
+      const color = CATEGORY_COLORS[i % CATEGORY_COLORS.length];
+      const label = svgEl('text', {x:padL-10, y:y+rowH/2+4, class:'axis-label', 'text-anchor':'end'});
+      label.textContent = s.cat;
+      svg.appendChild(label);
+      const rect = svgEl('rect', {x:padL, y:y+6, width:Math.max(barW,2), height: rowH-12, rx:4, fill:color});
+      rect.addEventListener('mousemove', (ev)=>showTooltip(tooltip, svg, ev,
+        '<b>'+s.cat+'</b>'+fmtValTable(s.val)+(total?(' · '+((s.val/total)*100).toFixed(1)+'%'):'')));
+      rect.addEventListener('mouseleave', ()=>hideTooltip(tooltip));
+      svg.appendChild(rect);
+      const valLabel = svgEl('text', {x:padL+Math.max(barW,2)+6, y:y+rowH/2+4, class:'axis-label', fill:'var(--text-primary)'});
+      valLabel.textContent = fmtVal(s.val);
+      svg.appendChild(valLabel);
     });
+
+    const tbody = document.querySelector('#extrasTable tbody');
+    const bodyRows = entries.map((e,i) => {
+      const pct = total ? ((e.val/total)*100).toFixed(1) : '0.0';
+      const color = CATEGORY_COLORS[i % CATEGORY_COLORS.length];
+      return '<tr><td><span class="cat-swatch" style="background:'+color+'"></span>'+escapeHtml(e.cat)+'</td><td>'+fmtValTable(e.val)+'</td><td>'+pct+'%</td></tr>';
+    }).join('');
+    const totalRow = '<tr class="total-row"><td>Total</td><td>'+fmtValTable(total)+'</td><td>100.0%</td></tr>';
+    tbody.innerHTML = bodyRows + totalRow;
   }
 
   // ----- category bar chart (horizontal) -----
@@ -1069,7 +1069,7 @@
     const isRevenue = categoryMetric === 'revenue';
 
     document.getElementById('categorySub').textContent = isRevenue
-      ? 'Ingreso (equivalente en pesos) por categoría de tour — suma de todas las formas de pago de cada venta.'
+      ? 'Ingreso base (equivalente en pesos) por categoría de tour — no incluye seguros ni extras (ver sección aparte).'
       : 'Suma de pasajeros reportados (columna TOTAL PAX) por categoría de tour.';
     document.getElementById('categoryValueHeader').textContent = isRevenue ? 'Ingreso (MXN)' : 'Pax';
 
@@ -1189,7 +1189,11 @@
     });
   });
 
-  daySelect.addEventListener('change', () => { if (lastViewData) renderCategoryChart(lastViewData, daySelect.value); });
+  daySelect.addEventListener('change', () => {
+    if (!lastViewData) return;
+    renderCategoryChart(lastViewData, daySelect.value);
+    renderExtrasChart(lastViewData, daySelect.value);
+  });
 
   document.querySelectorAll('#metricToggle .pill').forEach(btn => {
     btn.addEventListener('click', () => {
