@@ -287,6 +287,24 @@
     </div>
 
     <div class="panel">
+      <div class="section-title-row"><span class="dot" style="background:linear-gradient(135deg,var(--series-1),var(--series-2),var(--series-6))"></span><h2 class="section-title">Formas de pago acumuladas</h2></div>
+      <p class="section-sub">Distribución del ingreso total (equivalente en pesos) por forma de pago, sumando todos los días de la vista actual.</p>
+      <div class="legend" id="paymentDonutLegend"></div>
+      <div class="two-col">
+        <div class="chart-wrap">
+          <svg class="chart" id="paymentDonutChart" viewBox="0 0 360 360"></svg>
+          <div class="tooltip" id="paymentDonutTooltip"></div>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="paymentDonutTable">
+            <thead><tr><th>Forma de pago</th><th>Ingreso (MXN)</th><th>%</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
       <div class="section-title-row"><span class="dot" style="background:linear-gradient(135deg,var(--series-1),var(--series-2),var(--series-6))"></span><h2 class="section-title">Desglose por forma de pago, por día</h2></div>
       <p class="section-sub">Cada barra es un día; los montos en dólares se convierten a pesos con el tipo de cambio promedio reportado ese día.</p>
       <div class="legend" id="paymentLegend"></div>
@@ -323,7 +341,7 @@
   <footer>Generado localmente en tu navegador — ningún dato sale de tu computadora.</footer>
 </div>
 
-<script>window.__EMBEDDED_DATA__ = {"days": [{"date": "2026-07-27", "files": ["27 JULIO REPORTE INGRESOS.xlsx"], "transactions": 357, "noshows": 13, "pax": 1030.0, "fxAvg": 18.583551951219516, "mxnTotal": 1191257.579388, "usdTotal": 31197.44, "mxnEquivalent": 1782899.9489672685, "payment": {"efectivo": 366619.00048726826, "tarjeta": 1230754.8196, "transferencia": 0.0, "cuentasPorCobrar": 7555.88888, "pagosLinea": 48507.28, "anticipos": 129462.96}, "categoryRevenue": {"AI HALF": 299478.6213, "COMBO": 675290.465495805, "RZR": 297757.78380000003, "AI 6 HOURS": 2250.0, "CAMELLOS": 182729.77977999998, "AI FULL": 43496.020000000004, "MOTOS": 125872.11859146341, "TIROLESA": 5458.0, "CABALLOS": 33511.0, "PREMIUM": 36276.56, "COMBO3X1": 44773.0}, "categories": {"AI HALF": 156.0, "COMBO": 428.0, "RZR": 151.0, "AI 6 HOURS": 1.0, "CAMELLOS": 133.0, "AI FULL": 8.0, "MOTOS": 86.0, "TIROLESA": 11.0, "CABALLOS": 29.0, "PREMIUM": 6.0, "COMBO3X1": 21.0}, "concept": {"base": 1746893.3489672684, "seguros": 10606.6, "extraUpgrade": 5354.0, "guiaPrivado": 14011.0, "transportePrivado": 215.0, "fotografias": 149.0, "cargoPrivadosPlus": 5671.0}}, {"date": "2026-07-28", "files": ["28 JULIO REPORTE DE INGRESOS.xlsx"], "transactions": 406, "noshows": 9, "pax": 944.0, "fxAvg": 18.478873648648648, "mxnTotal": 1303561.38533, "usdTotal": 20755.2, "mxnEquivalent": 1697539.8519966665, "payment": {"efectivo": 356641.69490666664, "tarjeta": 1098735.4373299999, "transferencia": 22155.0, "cuentasPorCobrar": 5930.33256, "pagosLinea": 44001.72, "anticipos": 170075.66720000003}, "categoryRevenue": {"COMBO": 546130.7373966667, "RZR": 409427.7462, "AI 6 HOURS": 47526.0, "COMBO3X1": 112707.0, "AI HALF": 195446.27839999998, "AI FULL": 2310.0, "CAMELLOS": 214130.18000000002, "MOTOS": 75634.0, "TIROLESA": 48224.0, "AI PREMIUM 4 HOURS": 7713.0, "KIDS CLUB": 0.0, "CABALLOS": 2375.0, "CANCELED": 0.0}, "categories": {"COMBO": 337.0, "RZR": 178.0, "AI 6 HOURS": 13.0, "COMBO3X1": 45.0, "AI HALF": 99.0, "AI FULL": 3.0, "CAMELLOS": 185.0, "MOTOS": 42.0, "TIROLESA": 27.0, "AI PREMIUM 4 HOURS": 4.0, "KIDS CLUB": 2.0, "CABALLOS": 9.0, "CANCELED": 0.0}, "concept": {"base": 1661623.9419966666, "seguros": 9666.6, "extraUpgrade": 6666.0, "guiaPrivado": 9276.0, "transportePrivado": 129.31, "fotografias": 0.0, "cargoPrivadosPlus": 10178.0}}], "fileCount": 2, "generatedAt": "30/07/2026 07:11 UTC"};</script>
+<script>window.__EMBEDDED_DATA__ = {"days": [{"date": "2026-07-27", "files": ["27 JULIO REPORTE INGRESOS.xlsx"], "transactions": 357, "noshows": 13, "pax": 1030.0, "fxAvg": 18.583551951219516, "mxnTotal": 1191257.579388, "usdTotal": 31197.44, "mxnEquivalent": 1782899.9489672685, "payment": {"efectivo": 366619.00048726826, "tarjeta": 1230754.8196, "transferencia": 0.0, "cuentasPorCobrar": 7555.88888, "pagosLinea": 48507.28, "anticipos": 129462.96}, "categoryRevenue": {"AI HALF": 299478.6213, "COMBO": 675290.465495805, "RZR": 297757.78380000003, "AI 6 HOURS": 2250.0, "CAMELLOS": 182729.77977999998, "AI FULL": 43496.020000000004, "MOTOS": 125872.11859146341, "TIROLESA": 5458.0, "CABALLOS": 33511.0, "PREMIUM": 36276.56, "COMBO3X1": 44773.0}, "categories": {"AI HALF": 156.0, "COMBO": 428.0, "RZR": 151.0, "AI 6 HOURS": 1.0, "CAMELLOS": 133.0, "AI FULL": 8.0, "MOTOS": 86.0, "TIROLESA": 11.0, "CABALLOS": 29.0, "PREMIUM": 6.0, "COMBO3X1": 21.0}, "concept": {"base": 1746893.3489672684, "seguros": 10606.6, "extraUpgrade": 5354.0, "guiaPrivado": 14011.0, "transportePrivado": 215.0, "fotografias": 149.0, "cargoPrivadosPlus": 5671.0}}, {"date": "2026-07-28", "files": ["28 JULIO REPORTE DE INGRESOS.xlsx"], "transactions": 406, "noshows": 9, "pax": 944.0, "fxAvg": 18.478873648648648, "mxnTotal": 1303561.38533, "usdTotal": 20755.2, "mxnEquivalent": 1697539.8519966665, "payment": {"efectivo": 356641.69490666664, "tarjeta": 1098735.4373299999, "transferencia": 22155.0, "cuentasPorCobrar": 5930.33256, "pagosLinea": 44001.72, "anticipos": 170075.66720000003}, "categoryRevenue": {"COMBO": 546130.7373966667, "RZR": 409427.7462, "AI 6 HOURS": 47526.0, "COMBO3X1": 112707.0, "AI HALF": 195446.27839999998, "AI FULL": 2310.0, "CAMELLOS": 214130.18000000002, "MOTOS": 75634.0, "TIROLESA": 48224.0, "AI PREMIUM 4 HOURS": 7713.0, "KIDS CLUB": 0.0, "CABALLOS": 2375.0, "CANCELED": 0.0}, "categories": {"COMBO": 337.0, "RZR": 178.0, "AI 6 HOURS": 13.0, "COMBO3X1": 45.0, "AI HALF": 99.0, "AI FULL": 3.0, "CAMELLOS": 185.0, "MOTOS": 42.0, "TIROLESA": 27.0, "AI PREMIUM 4 HOURS": 4.0, "KIDS CLUB": 2.0, "CABALLOS": 9.0, "CANCELED": 0.0}, "concept": {"base": 1661623.9419966666, "seguros": 9666.6, "extraUpgrade": 6666.0, "guiaPrivado": 9276.0, "transportePrivado": 129.31, "fotografias": 0.0, "cargoPrivadosPlus": 10178.0}}], "fileCount": 2, "generatedAt": "30/07/2026 15:50 UTC"};</script>
 
 <script>
 (function(){
@@ -764,6 +782,7 @@
     renderDaySelect(viewData);
     renderTrendChart(viewData);
     renderPaymentChart(viewData);
+    renderPaymentDonut(viewData);
     renderExtrasChart(viewData, daySelect.value);
     renderCategoryChart(viewData, daySelect.value);
     renderDayTable(viewData);
@@ -1026,6 +1045,85 @@
       const pct = total ? ((e.val/total)*100).toFixed(1) : '0.0';
       const color = CATEGORY_COLORS[i % CATEGORY_COLORS.length];
       return '<tr><td><span class="cat-swatch" style="background:'+color+'"></span>'+escapeHtml(e.cat)+'</td><td>'+fmtValTable(e.val)+'</td><td>'+pct+'%</td></tr>';
+    }).join('');
+    const totalRow = '<tr class="total-row"><td>Total</td><td>'+fmtValTable(total)+'</td><td>100.0%</td></tr>';
+    tbody.innerHTML = bodyRows + totalRow;
+  }
+
+  // ----- payment method donut (acumulado) -----
+  function polarToCartesian(cx, cy, r, angleRad){
+    return { x: cx + r*Math.cos(angleRad), y: cy + r*Math.sin(angleRad) };
+  }
+  function donutSlicePath(cx, cy, rOuter, rInner, startAngle, endAngle){
+    const startOuter = polarToCartesian(cx, cy, rOuter, startAngle);
+    const endOuter = polarToCartesian(cx, cy, rOuter, endAngle);
+    const startInner = polarToCartesian(cx, cy, rInner, endAngle);
+    const endInner = polarToCartesian(cx, cy, rInner, startAngle);
+    const largeArc = (endAngle - startAngle) > Math.PI ? 1 : 0;
+    return [
+      'M', startOuter.x, startOuter.y,
+      'A', rOuter, rOuter, 0, largeArc, 1, endOuter.x, endOuter.y,
+      'L', startInner.x, startInner.y,
+      'A', rInner, rInner, 0, largeArc, 0, endInner.x, endInner.y,
+      'Z'
+    ].join(' ');
+  }
+
+  function renderPaymentDonut(data){
+    const svg = document.getElementById('paymentDonutChart');
+    const tooltip = document.getElementById('paymentDonutTooltip');
+    svg.innerHTML = '';
+    document.getElementById('paymentDonutLegend').innerHTML = PAYMENT_KEYS.map(p =>
+      '<span class="item"><span class="swatch" style="background:'+p.color+'"></span>'+p.label+'</span>'
+    ).join('');
+
+    const days = data.days;
+    const entries = PAYMENT_KEYS.map(p => ({
+      label: p.label, color: p.color,
+      val: days.reduce((s,d)=>s+(d.payment[p.key]||0),0)
+    })).filter(e => e.val > 0.005);
+    const total = entries.reduce((s,e)=>s+e.val,0);
+
+    const cx = 180, cy = 175, rOuter = 150, rInner = 92;
+    const fullCircle = Math.PI * 2 - 0.0001; // evita el caso degenerado de un solo arco de 360°
+    let angle = -Math.PI/2; // empieza arriba, en las 12
+    entries.forEach((e,i) => {
+      const frac = total ? e.val/total : 0;
+      const sweep = entries.length === 1 ? fullCircle : frac * Math.PI * 2;
+      const startAngle = angle;
+      const endAngle = angle + sweep;
+      const path = svgEl('path', {
+        d: donutSlicePath(cx, cy, rOuter, rInner, startAngle, endAngle),
+        fill: e.color, stroke: 'var(--surface-1)', 'stroke-width': 3, 'stroke-linejoin':'round'
+      });
+      path.addEventListener('mousemove', (ev)=>showTooltip(tooltip, svg, ev,
+        '<b>'+e.label+'</b>$'+fmtMoney(e.val)+(total?(' · '+(frac*100).toFixed(1)+'%'):'')));
+      path.addEventListener('mouseleave', ()=>hideTooltip(tooltip));
+      svg.appendChild(path);
+
+      // etiqueta directa con el % solo si la rebanada es lo bastante grande para no amontonarse
+      if (frac >= 0.06){
+        const mid = (startAngle+endAngle)/2;
+        const labelPos = polarToCartesian(cx, cy, (rOuter+rInner)/2, mid);
+        const label = svgEl('text', {x:labelPos.x, y:labelPos.y+5, 'text-anchor':'middle', fill:'#fff', 'font-size':'13px', 'font-weight':'600'});
+        label.textContent = (frac*100).toFixed(0)+'%';
+        svg.appendChild(label);
+      }
+      angle = endAngle;
+    });
+
+    const totalLabel = svgEl('text', {x:cx, y:cy-6, 'text-anchor':'middle', fill:'var(--text-primary)', 'font-size':'22px', 'font-weight':'700'});
+    totalLabel.textContent = '$'+fmtMoney(total,{compact:true});
+    svg.appendChild(totalLabel);
+    const totalSub = svgEl('text', {x:cx, y:cy+16, 'text-anchor':'middle', class:'axis-label'});
+    totalSub.textContent = 'Total acumulado';
+    svg.appendChild(totalSub);
+
+    const tbody = document.querySelector('#paymentDonutTable tbody');
+    const fmtValTable = v => '$'+fmtMoney(v);
+    const bodyRows = entries.map(e => {
+      const pct = total ? ((e.val/total)*100).toFixed(1) : '0.0';
+      return '<tr><td><span class="cat-swatch" style="background:'+e.color+'"></span>'+escapeHtml(e.label)+'</td><td>'+fmtValTable(e.val)+'</td><td>'+pct+'%</td></tr>';
     }).join('');
     const totalRow = '<tr class="total-row"><td>Total</td><td>'+fmtValTable(total)+'</td><td>100.0%</td></tr>';
     tbody.innerHTML = bodyRows + totalRow;
